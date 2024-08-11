@@ -1,0 +1,13 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import LoginFeature from '@/features/login'
+---
+
+<Layout>
+  <LoginFeature
+    client:load
+    url={Astro.url}
+    user={Astro.locals.user}
+    params={Astro.params}
+  />
+</Layout>

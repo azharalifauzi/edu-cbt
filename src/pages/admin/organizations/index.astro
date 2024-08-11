@@ -1,0 +1,13 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import OrganizationFeature from '@/features/admin/organizations'
+---
+
+<Layout>
+  <OrganizationFeature
+    client:load
+    params={Astro.params}
+    url={Astro.url}
+    user={Astro.locals.user}
+  />
+</Layout>

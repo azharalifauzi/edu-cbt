@@ -1,0 +1,13 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import UserRoleManagement from '@/features/admin/users/roles'
+---
+
+<Layout>
+  <UserRoleManagement
+    params={Astro.params}
+    url={Astro.url}
+    user={Astro.locals.user}
+    client:load
+  />
+</Layout>

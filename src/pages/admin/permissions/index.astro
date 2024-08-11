@@ -1,0 +1,13 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import PermissionFeature from '@/features/admin/permissions'
+---
+
+<Layout>
+  <PermissionFeature
+    client:load
+    params={Astro.params}
+    url={Astro.url}
+    user={Astro.locals.user}
+  />
+</Layout>

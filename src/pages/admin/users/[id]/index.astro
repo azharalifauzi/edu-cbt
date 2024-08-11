@@ -1,0 +1,13 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import UserProfile from '@/features/admin/users/profile'
+---
+
+<Layout>
+  <UserProfile
+    params={Astro.params}
+    url={Astro.url}
+    user={Astro.locals.user}
+    client:load
+  />
+</Layout>

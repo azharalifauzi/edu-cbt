@@ -43,6 +43,21 @@ const app = new Hono()
       const data = c.req.valid('json')
       const user = await createUserByEmailAndPassword(data)
 
+      const assignedRoles = await db
+        .select()
+        .from(roles)
+        .where(eq(roles.assignedOnSignUp, true))
+
+      if (assignedRoles.length > 0) {
+        await db.insert(rolesToUsers).values(
+          assignedRoles.map((role) => ({
+            roleId: role.id,
+            userId: user.id,
+            organizationId: DEFAULT_ORG_ID,
+          }))
+        )
+      }
+
       return generateJsonResponse(c, user, 201)
     }
   )

@@ -33,6 +33,7 @@ export const roles = pgTable('roles', {
   key: varchar('key', { length: 256 }).unique().notNull(),
   description: text('description'),
   createdAt: timestamp('created_at', { mode: 'string' }).notNull().defaultNow(),
+  assignedOnSignUp: boolean('assigned_on_signup').default(false),
 })
 
 export const permissions = pgTable('permissions', {
@@ -82,7 +83,7 @@ export const permissionsToRoles = pgTable(
     roleId: serial('role_id')
       .notNull()
       .references(() => roles.id, { onDelete: 'cascade' }),
-    permissionId: serial('user_id')
+    permissionId: serial('permission_id')
       .notNull()
       .references(() => permissions.id, { onDelete: 'cascade' }),
   },
@@ -184,3 +185,82 @@ export const sessions = pgTable('sessions', {
     .notNull(),
   expiresAt: timestamp('expires_at', { mode: 'string' }).notNull(),
 })
+
+export const courseCategories = pgTable('course_categories', {
+  id: serial('id').primaryKey(),
+  name: varchar('name').notNull(),
+  slug: varchar('name').notNull(),
+})
+
+export const courses = pgTable('courses', {
+  id: serial('id').primaryKey(),
+  name: varchar('name').notNull(),
+  slug: varchar('slug').notNull(),
+  image: text('image'),
+  categoryId: serial('category_id')
+    .references(() => courseCategories.id, {
+      onDelete: 'cascade',
+    })
+    .notNull(),
+})
+
+export const courseQuestions = pgTable('course_questions', {
+  id: serial('id').primaryKey(),
+  question: text('question').notNull(),
+  courseId: serial('course_id').references(() => courses.id, {
+    onDelete: 'cascade',
+  }),
+})
+
+export const courseAnswerOptions = pgTable('course_answer_options', {
+  id: serial('id').primaryKey(),
+  value: text('value').notNull(),
+  questionId: serial('question_id').references(() => courseQuestions.id, {
+    onDelete: 'cascade',
+  }),
+  isCorrect: boolean('is_correct').default(false),
+})
+
+export const teachersToCourses = pgTable(
+  'teachers_to_courses',
+  {
+    teacherId: serial('teacher_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    courseId: serial('course_id')
+      .notNull()
+      .references(() => courses.id, { onDelete: 'cascade' }),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.teacherId, t.courseId] }) })
+)
+
+export const studentsToCourses = pgTable(
+  'students_to_courses',
+  {
+    studentId: serial('student_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    courseId: serial('course_id')
+      .notNull()
+      .references(() => courses.id, { onDelete: 'cascade' }),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.studentId, t.courseId] }) })
+)
+
+export const studentsToAnswers = pgTable(
+  'students_to_answers',
+  {
+    studentId: serial('id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    questionId: serial('question_id')
+      .notNull()
+      .references(() => courseQuestions.id, { onDelete: 'cascade' }),
+    answerId: serial('answer_id')
+      .notNull()
+      .references(() => courseQuestions.id, { onDelete: 'cascade' }),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.studentId, t.questionId, t.answerId] }),
+  })
+)

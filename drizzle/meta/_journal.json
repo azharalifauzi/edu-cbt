@@ -15,6 +15,13 @@
       "when": 1723436024837,
       "tag": "0001_medical_sage",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1723440459748,
+      "tag": "0002_eager_siren",
+      "breakpoints": true
     }
   ]
 }

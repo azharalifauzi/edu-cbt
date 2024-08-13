@@ -8,6 +8,7 @@ import {
   text,
   timestamp,
   varchar,
+  doublePrecision,
 } from 'drizzle-orm/pg-core'
 
 export const users = pgTable('users', {
@@ -202,23 +203,33 @@ export const courses = pgTable('courses', {
       onDelete: 'cascade',
     })
     .notNull(),
+  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+  publishedAt: timestamp('published_at', { mode: 'string' })
+    .defaultNow()
+    .notNull(),
+  testDuration: doublePrecision('test_duration').default(0).notNull(),
 })
 
 export const courseQuestions = pgTable('course_questions', {
   id: serial('id').primaryKey(),
   question: text('question').notNull(),
-  courseId: serial('course_id').references(() => courses.id, {
-    onDelete: 'cascade',
-  }),
+  courseId: serial('course_id')
+    .references(() => courses.id, {
+      onDelete: 'cascade',
+    })
+    .notNull(),
 })
 
 export const courseAnswerOptions = pgTable('course_answer_options', {
   id: serial('id').primaryKey(),
   value: text('value').notNull(),
-  questionId: serial('question_id').references(() => courseQuestions.id, {
-    onDelete: 'cascade',
-  }),
-  isCorrect: boolean('is_correct').default(false),
+  questionId: serial('question_id')
+    .references(() => courseQuestions.id, {
+      onDelete: 'cascade',
+    })
+    .notNull(),
+  isCorrect: boolean('is_correct').default(false).notNull(),
 })
 
 export const teachersToCourses = pgTable(
@@ -243,6 +254,11 @@ export const studentsToCourses = pgTable(
     courseId: serial('course_id')
       .notNull()
       .references(() => courses.id, { onDelete: 'cascade' }),
+    joinedAt: timestamp('joined_at', { mode: 'string' }).defaultNow().notNull(),
+    startedAt: timestamp('joined_at', { mode: 'string' }),
+    finishedAt: timestamp('finished_at', { mode: 'string' }),
+    isPassed: boolean('is_passed'),
+    score: integer('score'),
   },
   (t) => ({ pk: primaryKey({ columns: [t.studentId, t.courseId] }) })
 )
@@ -259,6 +275,12 @@ export const studentsToAnswers = pgTable(
     answerId: serial('answer_id')
       .notNull()
       .references(() => courseQuestions.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string' })
+      .defaultNow()
+      .notNull(),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.studentId, t.questionId, t.answerId] }),

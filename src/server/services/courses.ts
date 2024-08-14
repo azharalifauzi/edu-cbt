@@ -335,11 +335,27 @@ export const getStudentRapport = async (courseId: number, userId: number) => {
     )
     .groupBy(courseQuestions.id)
 
-  return rapport.map((r) => ({
-    isCorrect: r.optionData[0].isCorrect,
-    questionId: r.id,
-    question: r.question,
-    answerId: r.optionData[0].id,
-    answer: r.optionData[0].value,
-  }))
+  const allQuestions = await getQuestionsByCourseId(courseId)
+
+  return allQuestions.map((q) => {
+    const answer = rapport.find((r) => r.id === q.id)
+
+    if (!answer) {
+      return {
+        isCorrect: false,
+        questionId: q.id,
+        question: q.question,
+        answerId: null,
+        answer: null,
+      }
+    }
+
+    return {
+      isCorrect: answer.optionData[0].isCorrect,
+      questionId: q.id,
+      question: q.question,
+      answerId: answer.optionData[0].id,
+      answer: answer.optionData[0].value,
+    }
+  })
 }

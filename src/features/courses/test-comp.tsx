@@ -70,7 +70,7 @@ const TestCompFeature: React.FC<Props> = ({
     setDurationLeft(timeLeft)
     setProgress(timeLeft / (duration * 60))
 
-    if (timeLeft < 0) {
+    if (timeLeft < 0 && !isFinished) {
       handleFinish.mutate()
     }
   }, 1000)

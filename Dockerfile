@@ -29,4 +29,4 @@ ENV HOST=0.0.0.0
 ENV PORT=4321
 USER bun
 EXPOSE 4321/tcp
-CMD bun run preview
+CMD [ "bun", "run", "./dist/server/entry.mjs" ]

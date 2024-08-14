@@ -2,6 +2,7 @@ import { and, count, desc, eq, getTableColumns, gte, ilike } from 'drizzle-orm'
 import { db } from '../lib/db'
 import {
   courseAnswerOptions,
+  courseCategories,
   courseQuestions,
   courses,
   studentsToAnswers,
@@ -122,13 +123,22 @@ export const getCoursesByStudentId = async (
 
   const data = await db
     .select({
-      ...getTableColumns(studentsToCourses),
-      courseData: jsonBuildObject(getTableColumns(courses)),
+      ...getTableColumns(courses),
+      students: jsonAggBuildObjectOrEmptyArray(
+        studentsToCourses,
+        getTableColumns(studentsToCourses)
+      ),
+      categories: jsonAggBuildObjectOrEmptyArray(
+        courseCategories,
+        getTableColumns(courseCategories)
+      ),
     })
-    .from(studentsToCourses)
-    .leftJoin(courses, eq(courses.id, studentsToCourses.courseId))
+    .from(courses)
+    .leftJoin(studentsToCourses, eq(courses.id, studentsToCourses.courseId))
+    .leftJoin(courseCategories, eq(courseCategories.id, courses.categoryId))
     .limit(size)
     .offset(skip)
+    .groupBy(courses.id)
     .where(
       and(
         eq(studentsToCourses.studentId, userId),
@@ -139,7 +149,11 @@ export const getCoursesByStudentId = async (
 
   return {
     pageCount,
-    data,
+    data: data.map(({ students, categories, ...other }) => ({
+      ...other,
+      studentData: students[0],
+      category: categories[0],
+    })),
     totalCount: totalCount[0].count,
   }
 }

@@ -80,10 +80,10 @@ const OverviewFeature = () => {
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,_minmax(300px,1fr))] gap-6">
         {courses?.map((course) => {
-          const myCourse = myCourses?.find((c) => c.courseId === course.id)
+          const myCourse = myCourses?.find((c) => c.id === course.id)
           const hasJoined = !!myCourse
-          const hasStarted = !!myCourse?.startedAt
-          const hasFinished = !!myCourse?.finishedAt
+          const hasStarted = !!myCourse?.studentData.startedAt
+          const hasFinished = !!myCourse?.studentData.finishedAt
 
           return (
             <div

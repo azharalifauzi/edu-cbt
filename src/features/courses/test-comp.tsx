@@ -10,6 +10,7 @@ import { Book, CheckCircle2, ChevronRightCircle } from 'lucide-react'
 import { useState } from 'react'
 import { produce } from 'immer'
 import { Button } from '@/components/ui/button'
+import Link from '@/components/link'
 
 const TestCompFeature = () => {
   const { id } = useParams()
@@ -31,11 +32,11 @@ const TestCompFeature = () => {
 
       const { data } = await unwrapResponse(res)
 
-      if (data.finishedAt !== null) {
+      if (data.studentData.finishedAt !== null) {
         setFinished(true)
       }
 
-      if (data.startedAt === null) {
+      if (data.studentData.startedAt === null) {
         await unwrapResponse(
           client.api.v1.course[':id'].start.$post({
             param: {
@@ -157,22 +158,20 @@ const TestCompFeature = () => {
     <main>
       <header className="flex items-center h-16 border-b border-gray-100 justify-between px-4 fixed top-0 left-0 right-0 z-10 bg-white">
         <div className="flex items-center gap-2">
-          {course?.courseData.image ? (
+          {course?.image ? (
             <img
-              src={course?.courseData.image ?? ''}
+              src={course?.image ?? ''}
               className="h-8 w-8 rounded-full object-cover object-center"
             />
           ) : (
             <Book />
           )}
           <div>
-            <div className="text-sm font-semibold">
-              {course?.courseData.name}
-            </div>
+            <div className="text-sm font-semibold">{course?.name}</div>
             <div className="text-xs text-gray-400">
               Duration:{' '}
-              {course?.courseData.testDuration
-                ? humanizeDuration(course?.courseData.testDuration * 60 * 1000)
+              {course?.testDuration
+                ? humanizeDuration(course?.testDuration * 60 * 1000)
                 : 'Infinity'}
             </div>
           </div>
@@ -195,7 +194,7 @@ const TestCompFeature = () => {
       {isFinished && (
         <div className="max-w-3xl mx-auto pt-32 px-6 text-center flex flex-col items-center">
           <img
-            src={course?.courseData.image ?? ''}
+            src={course?.image ?? ''}
             className="rounded-full object-cover object-center h-[200px] w-[200px] mb-8"
           />
           <div className="text-4xl font-bold mb-4">
@@ -205,8 +204,8 @@ const TestCompFeature = () => {
             Hopefully you will get a better result to prepare your great future
             career soon enough
           </div>
-          <Button variant="purple" className="w-44">
-            View Test Result
+          <Button asChild variant="purple" className="w-44">
+            <Link to={`/courses/${id}/rapport`}>View Test Result</Link>
           </Button>
         </div>
       )}

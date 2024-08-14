@@ -49,7 +49,9 @@ const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         </div>
       </header>
       <div className="fixed top-0 left-0 bottom-0 w-[270px] bg-gray-100">
-        <div className="h-[92px] flex items-center font-bold px-6">EduCBT</div>
+        <div className="h-[92px] flex items-center font-extrabold px-6 text-2xl justify-center">
+          EduCBT
+        </div>
         <div className="mt-1 px-6">
           <div className="font-bold mb-3 text-xs text-gray-400">DAILY USE</div>
           <div className="grid gap-3">

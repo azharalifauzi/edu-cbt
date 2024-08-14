@@ -1,0 +1,34 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import RapportFeature from '@/features/courses/rapport'
+import {
+  getCoursesByStudentId,
+  getStudentRapport,
+} from '@/server/services/courses'
+
+const {
+  params: { id },
+  locals: { user },
+} = Astro
+
+const courseId = Number(id!)
+
+const rapport = await getStudentRapport(courseId, user.id)
+const {
+  data: [course],
+} = await getCoursesByStudentId(user.id, { courseId })
+---
+
+<Layout>
+  <RapportFeature
+    client:load
+    params={Astro.params}
+    url={Astro.url}
+    user={Astro.locals.user}
+    courseName={course.name}
+    courseCatetegory={course.category.name}
+    courseImage={course.image}
+    studentAnswers={rapport}
+    isPassed={course.studentData.isPassed}
+  />
+</Layout>

@@ -58,6 +58,23 @@ const app = new Hono()
         )
       }
 
+      const sessionId = uuidv4()
+      const sessionToken = createSessionToken(sessionId)
+      const expiresAt = dayjs().add(7, 'days').toDate()
+
+      await db.insert(sessions).values({
+        expiresAt: expiresAt.toISOString(),
+        sessionToken,
+        userId: user.id,
+      })
+
+      setCookie(c, SESSION_COOKIE_NAME, sessionToken, {
+        secure: true,
+        httpOnly: true,
+        sameSite: 'Strict',
+        expires: expiresAt,
+      })
+
       return generateJsonResponse(c, user, 201)
     }
   )

@@ -51,7 +51,7 @@ if (!course.studentData.startedAt) {
     user={Astro.locals.user}
     questions={questions}
     defaultAnswers={defaultAnswers}
-    startedAt={course.studentData.startedAt}
+    startedAt={course.studentData.startedAt ?? dayjs().toISOString()}
     finishedAt={course.studentData.finishedAt}
     course={course}
   />

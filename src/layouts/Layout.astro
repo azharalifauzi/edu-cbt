@@ -9,9 +9,10 @@ import { Toaster } from '@/components/ui/sonner'
 interface Props {
   title?: string
   description?: string
+  className?: string
 }
 
-const { title = 'EduCBT', description } = Astro.props
+const { title = 'EduCBT', description, className } = Astro.props
 ---
 
 <!doctype html>
@@ -48,14 +49,14 @@ const { title = 'EduCBT', description } = Astro.props
           preload: true,
           display: 'swap',
           selector: 'body',
-          fallback: 'sans-serif'
-        }
+          fallback: 'sans-serif',
+        },
       ]}
     />
     <ViewTransitions />
     <LoadingIndicator color="#000" />
   </head>
-  <body>
+  <body class={className}>
     <slot />
     <Toaster client:only="react" />
   </body>

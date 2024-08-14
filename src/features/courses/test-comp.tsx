@@ -29,7 +29,7 @@ interface Props {
    * value: Id of answer option
    */
   defaultAnswers: Record<number, number>
-  startedAt: string | null
+  startedAt: string
   finishedAt: string | null
   course: {
     name: string
@@ -62,13 +62,11 @@ const TestCompFeature: React.FC<Props> = ({
 
   useInterval(() => {
     const now = dayjs().unix()
-    const startTime = startedAt
-      ? dayjs(startedAt).unix()
-      : dayjs().subtract(1, 's').unix()
+    const startTime = dayjs(startedAt).unix()
     const duration = course.testDuration
-
     const usedTime = now - startTime
     const timeLeft = duration * 60 - usedTime
+
     setDurationLeft(timeLeft)
     setProgress(timeLeft / (duration * 60))
 

@@ -40,7 +40,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next()
   }
 
-  if (context.url.pathname === '/login' && (await isLoggedin(context))) {
+  if (publicUrl.includes(context.url.pathname) && (await isLoggedin(context))) {
     return context.redirect('/')
   }
 

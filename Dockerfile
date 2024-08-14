@@ -22,9 +22,11 @@ RUN bun b
 # copy production dependencies and source code into final image
 FROM base AS release
 COPY --from=install /temp/dev/node_modules node_modules
-COPY --from=prerelease /usr/src/app .
+COPY --from=prerelease /usr/src/app/dist ./dist
 
 # run the app
+ENV HOST=0.0.0.0
+ENV PORT=4321
 USER bun
 EXPOSE 4321/tcp
-ENTRYPOINT [ "bun", "run", "preview" ]
+CMD bun run preview

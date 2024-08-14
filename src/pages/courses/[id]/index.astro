@@ -1,6 +1,46 @@
 ---
 import Layout from '@/layouts/Layout.astro'
 import TestCompFeature from '@/features/courses/test-comp'
+import {
+  getCoursesByStudentId,
+  getQuestionsByCourseId,
+  getStudentAnswer,
+} from '@/server/services/courses'
+import { studentsToCourses } from '@/server/models'
+import dayjs from 'dayjs'
+import { and, eq } from 'drizzle-orm'
+import { db } from '@/server/lib/db'
+
+const { user } = Astro.locals
+const { id } = Astro.params
+const courseId = Number(id!)
+const questions = await getQuestionsByCourseId(courseId)
+const answers = await getStudentAnswer(user.id, courseId)
+const course = (await getCoursesByStudentId(user.id, { courseId })).data[0]
+
+const defaultAnswers: Record<number, number> = {}
+
+questions.forEach((q, index) => {
+  const answer = answers.find((a) => a.id === q.id)
+  if (answer) {
+    defaultAnswers[index] = answer.optionData[0].id
+  }
+})
+
+if (!course.studentData.startedAt) {
+  await db
+    .update(studentsToCourses)
+    .set({
+      startedAt: dayjs().toISOString(),
+      isStarted: true,
+    })
+    .where(
+      and(
+        eq(studentsToCourses.courseId, courseId),
+        eq(studentsToCourses.studentId, user.id)
+      )
+    )
+}
 ---
 
 <Layout>
@@ -9,5 +49,10 @@ import TestCompFeature from '@/features/courses/test-comp'
     params={Astro.params}
     url={Astro.url}
     user={Astro.locals.user}
+    questions={questions}
+    defaultAnswers={defaultAnswers}
+    startedAt={course.studentData.startedAt}
+    finishedAt={course.studentData.finishedAt}
+    course={course}
   />
 </Layout>

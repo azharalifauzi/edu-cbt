@@ -7,84 +7,49 @@ import { client, QueryKey, unwrapResponse } from '@/utils/fetcher'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import humanizeDuration from 'humanize-duration'
 import { Book, CheckCircle2, ChevronRightCircle } from 'lucide-react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { produce } from 'immer'
 import { Button } from '@/components/ui/button'
 import Link from '@/components/link'
 
-const TestCompFeature = () => {
+interface Props {
+  questions: {
+    id: number
+    question: string
+    answerOptions: {
+      id: number
+      value: string
+    }[]
+  }[]
+  /**
+   * In case user reload the page, the answer is saved.
+   * Key : index of question
+   * value: Id of answer option
+   */
+  defaultAnswers: Record<number, number>
+  startedAt: string | null
+  finishedAt: string | null
+  course: {
+    name: string
+    image: string | null
+    testDuration: number
+  }
+}
+
+const TestCompFeature: React.FC<Props> = ({
+  defaultAnswers,
+  questions,
+  startedAt,
+  finishedAt,
+  course,
+}) => {
   const { id } = useParams()
   const { user } = useUser()
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0)
-  const [answers, setAnswers] = useState<Record<number, number>>({})
-  const [isFinished, setFinished] = useState(false)
+  const [answers, setAnswers] = useState<Record<number, number>>(defaultAnswers)
+  const [isFinished, setFinished] = useState(!!finishedAt)
 
   const queryClient = useQueryClient()
-
-  const { data: course } = useQuery({
-    queryKey: [QueryKey.MyCourses, id],
-    queryFn: async () => {
-      const res = client.api.v1.course['my-courses'][':courseId'].$get({
-        param: {
-          courseId: id!.toString(),
-        },
-      })
-
-      const { data } = await unwrapResponse(res)
-
-      if (data.studentData.finishedAt !== null) {
-        setFinished(true)
-      }
-
-      if (data.studentData.startedAt === null) {
-        await unwrapResponse(
-          client.api.v1.course[':id'].start.$post({
-            param: {
-              id: id!,
-            },
-          })
-        )
-      }
-
-      return data
-    },
-    enabled: !!id,
-  })
-
-  const { data: questions, isLoading: isCourseLoading } = useQuery({
-    queryKey: [QueryKey.Questions, QueryKey.Answers, id],
-    queryFn: async () => {
-      const res = client.api.v1.course[':id'].questions.$get({
-        param: {
-          id: id!,
-        },
-      })
-
-      const { data: questions } = await unwrapResponse(res)
-
-      const answerRes = client.api.v1.course[':id'].answers.$get({
-        param: {
-          id: id!,
-        },
-      })
-
-      const { data: dbAnswers } = await unwrapResponse(answerRes)
-
-      setAnswers(
-        produce((draft) => {
-          questions.forEach((q, index) => {
-            const answer = dbAnswers.find((a) => a.id === q.id)
-            if (answer) {
-              draft[index] = answer.optionData[0].id
-            }
-          })
-        })
-      )
-
-      return questions
-    },
-    enabled: !!id,
-  })
 
   const activeQuestion = questions?.[currentQuestionIdx]
   const activeAnswer =
@@ -210,7 +175,7 @@ const TestCompFeature = () => {
         </div>
       )}
 
-      {!isFinished && !isCourseLoading && (
+      {!isFinished && (
         <div className="max-w-3xl mx-auto pt-32 px-6">
           <div className="text-4xl font-semibold text-center mb-12 leading-snug">
             {activeQuestion?.question}

@@ -10,10 +10,7 @@ import {
   teachersToCourses,
   users,
 } from '../models'
-import {
-  jsonAggBuildObjectOrEmptyArray,
-  jsonBuildObject,
-} from '../utils/drizzle'
+import { jsonAggBuildObjectOrEmptyArray } from '../utils/drizzle'
 import dayjs from 'dayjs'
 
 export const getCourseById = async (id: number) => {

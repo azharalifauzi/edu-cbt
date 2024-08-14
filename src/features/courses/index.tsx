@@ -81,6 +81,7 @@ const columns = [
       const {
         studentData: { finishedAt, startedAt },
       } = info.row.original
+
       if (!startedAt)
         return (
           <Button asChild className="mx-auto flex w-max" variant="purple">

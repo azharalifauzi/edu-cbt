@@ -34,10 +34,10 @@ const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   return (
     <main>
       <header className="fixed top-0 left-[270px] right-0 h-[92px] border-b border-gray-100 flex items-center justify-end px-5">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <div className="text-right">
-            <div className="text-sm text-gray-400">Howdy</div>
-            <div className="font-semibold">{user?.name}</div>
+            <div className="text-xs text-gray-400">Howdy</div>
+            <div className="font-semibold text-sm">{user?.name}</div>
           </div>
           <Avatar>
             <AvatarImage

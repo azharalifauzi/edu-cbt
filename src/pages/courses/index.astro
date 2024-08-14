@@ -1,0 +1,22 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import MyCoursesFeature from '@/features/courses'
+import { getCoursesByStudentId } from '@/server/services/courses'
+
+const { user } = Astro.locals
+
+const courses = await getCoursesByStudentId(user.id, {
+  page: 1,
+  size: 999,
+})
+---
+
+<Layout>
+  <MyCoursesFeature
+    client:load
+    params={Astro.params}
+    url={Astro.url}
+    user={Astro.locals.user}
+    data={courses.data}
+  />
+</Layout>

@@ -4,13 +4,15 @@ import { useParams } from '@/hooks/route'
 import { useUser } from '@/hooks/user'
 import { cn } from '@/utils'
 import { client, QueryKey, unwrapResponse } from '@/utils/fetcher'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import humanizeDuration from 'humanize-duration'
 import { Book, CheckCircle2, ChevronRightCircle } from 'lucide-react'
 import React, { useState } from 'react'
 import { produce } from 'immer'
 import { Button } from '@/components/ui/button'
 import Link from '@/components/link'
+import { useInterval } from '@/hooks'
+import dayjs from 'dayjs'
 
 interface Props {
   questions: {
@@ -48,6 +50,8 @@ const TestCompFeature: React.FC<Props> = ({
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0)
   const [answers, setAnswers] = useState<Record<number, number>>(defaultAnswers)
   const [isFinished, setFinished] = useState(!!finishedAt)
+  const [progress, setProgress] = useState(1)
+  const [durationLeft, setDurationLeft] = useState(course.testDuration * 60)
 
   const queryClient = useQueryClient()
 
@@ -55,6 +59,23 @@ const TestCompFeature: React.FC<Props> = ({
   const activeAnswer =
     answers[currentQuestionIdx] ?? activeQuestion?.answerOptions[0].id
   const isLastQuestion = currentQuestionIdx + 1 === questions?.length
+
+  useInterval(() => {
+    const now = dayjs().unix()
+    const startTime = startedAt
+      ? dayjs(startedAt).unix()
+      : dayjs().subtract(1, 's').unix()
+    const duration = course.testDuration
+
+    const usedTime = now - startTime
+    const timeLeft = duration * 60 - usedTime
+    setDurationLeft(timeLeft)
+    setProgress(timeLeft / (duration * 60))
+
+    if (timeLeft < 0) {
+      handleFinish.mutate()
+    }
+  }, 1000)
 
   const handleSaveAnswer = useMutation({
     mutationFn: async () => {
@@ -121,6 +142,40 @@ const TestCompFeature: React.FC<Props> = ({
 
   return (
     <main>
+      {!isFinished && (
+        <div className="fixed bottom-6 left-6 flex items-center gap-3 bg-orange-100 pl-3 pr-4 py-3 rounded-md z-10">
+          <svg
+            className="-rotate-90 scale-y-[-1]"
+            width="40"
+            height="40"
+            viewBox="0 0 180 180"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="90"
+              cy="90"
+              r="83.5"
+              stroke="#fed7aa"
+              strokeWidth="13"
+              className="transition-all duration-200 ease-in-out"
+            />
+            <circle
+              cx="90"
+              cy="90"
+              r="83.5"
+              stroke="#F6770B"
+              strokeWidth="13"
+              strokeDasharray={Math.PI * 2 * 83.5}
+              strokeDashoffset={Math.PI * 2 * (1 - progress) * 83.5}
+              className="transition-all duration-200 ease-in-out"
+            />
+          </svg>
+          <div className="text-sm font-semibold">
+            {humanizeDuration(durationLeft * 1000)} left
+          </div>
+        </div>
+      )}
       <header className="flex items-center h-16 border-b border-gray-100 justify-between px-4 fixed top-0 left-0 right-0 z-10 bg-white">
         <div className="flex items-center gap-2">
           {course?.image ? (
@@ -141,6 +196,7 @@ const TestCompFeature: React.FC<Props> = ({
             </div>
           </div>
         </div>
+
         <div className="flex items-center gap-2">
           <div className="text-right">
             <div className="text-xs text-gray-400">Howdy</div>

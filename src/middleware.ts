@@ -22,11 +22,17 @@ const isLoggedin = async (context: APIContext) => {
   return user
 }
 
+const publicUrl = ['/login', '/sign-up']
+
 export const onRequest = defineMiddleware(async (context, next) => {
-  if (context.url.pathname.startsWith('/admin')) {
+  if (context.url.pathname.startsWith('/api')) {
+    return next()
+  }
+
+  if (!publicUrl.includes(context.url.pathname)) {
     const user = await isLoggedin(context)
     if (!user) {
-      return context.rewrite('/not-found')
+      return context.redirect('/login')
     }
 
     context.locals.user = user
@@ -35,7 +41,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   if (context.url.pathname === '/login' && (await isLoggedin(context))) {
-    return context.redirect('/admin')
+    return context.redirect('/')
   }
 
   return next()

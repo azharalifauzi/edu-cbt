@@ -190,7 +190,7 @@ export const sessions = pgTable('sessions', {
 export const courseCategories = pgTable('course_categories', {
   id: serial('id').primaryKey(),
   name: varchar('name').notNull(),
-  slug: varchar('name').notNull(),
+  slug: varchar('slug').unique().notNull(),
 })
 
 export const courses = pgTable('courses', {
@@ -255,9 +255,10 @@ export const studentsToCourses = pgTable(
       .notNull()
       .references(() => courses.id, { onDelete: 'cascade' }),
     joinedAt: timestamp('joined_at', { mode: 'string' }).defaultNow().notNull(),
-    startedAt: timestamp('joined_at', { mode: 'string' }),
+    startedAt: timestamp('started_at', { mode: 'string' }),
     finishedAt: timestamp('finished_at', { mode: 'string' }),
     isPassed: boolean('is_passed'),
+    isStarted: boolean('is_started').notNull().default(false),
     score: integer('score'),
   },
   (t) => ({ pk: primaryKey({ columns: [t.studentId, t.courseId] }) })
@@ -266,7 +267,7 @@ export const studentsToCourses = pgTable(
 export const studentsToAnswers = pgTable(
   'students_to_answers',
   {
-    studentId: serial('id')
+    studentId: serial('student_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     questionId: serial('question_id')
@@ -274,7 +275,7 @@ export const studentsToAnswers = pgTable(
       .references(() => courseQuestions.id, { onDelete: 'cascade' }),
     answerId: serial('answer_id')
       .notNull()
-      .references(() => courseQuestions.id, { onDelete: 'cascade' }),
+      .references(() => courseAnswerOptions.id, { onDelete: 'cascade' }),
     createdAt: timestamp('created_at', { mode: 'string' })
       .defaultNow()
       .notNull(),

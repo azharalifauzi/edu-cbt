@@ -1,0 +1,80 @@
+{
+  "id": 3,
+  "topic": "Places in the World and Their Locations",
+  "category": "geography",
+  "image": "https://media.cntraveller.com/photos/611bece34e09f53b43732f58/16:9/w_3200,h_1800,c_limit/beautiful.jpg",
+  "questions": [
+    {
+      "question": "Where is the Great Wall of China located?",
+      "options": [
+        { "value": "China", "isCorrect": true },
+        { "value": "Japan", "isCorrect": false },
+        { "value": "India", "isCorrect": false },
+        { "value": "South Korea", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Where can you find the Eiffel Tower?",
+      "options": [
+        { "value": "France", "isCorrect": true },
+        { "value": "Italy", "isCorrect": false },
+        { "value": "Germany", "isCorrect": false },
+        { "value": "Spain", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "In which country is the Colosseum located?",
+      "options": [
+        { "value": "Italy", "isCorrect": true },
+        { "value": "Greece", "isCorrect": false },
+        { "value": "Turkey", "isCorrect": false },
+        { "value": "Egypt", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Which country is home to the Taj Mahal?",
+      "options": [
+        { "value": "India", "isCorrect": true },
+        { "value": "Pakistan", "isCorrect": false },
+        { "value": "Bangladesh", "isCorrect": false },
+        { "value": "Sri Lanka", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Where is Machu Picchu located?",
+      "options": [
+        { "value": "Peru", "isCorrect": true },
+        { "value": "Brazil", "isCorrect": false },
+        { "value": "Chile", "isCorrect": false },
+        { "value": "Mexico", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "In which country is the Sydney Opera House located?",
+      "options": [
+        { "value": "Australia", "isCorrect": true },
+        { "value": "New Zealand", "isCorrect": false },
+        { "value": "Canada", "isCorrect": false },
+        { "value": "United Kingdom", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Where is Mount Kilimanjaro located?",
+      "options": [
+        { "value": "Tanzania", "isCorrect": true },
+        { "value": "Kenya", "isCorrect": false },
+        { "value": "South Africa", "isCorrect": false },
+        { "value": "Uganda", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "In which country can you visit the Acropolis of Athens?",
+      "options": [
+        { "value": "Greece", "isCorrect": true },
+        { "value": "Italy", "isCorrect": false },
+        { "value": "Spain", "isCorrect": false },
+        { "value": "Turkey", "isCorrect": false }
+      ]
+    }
+  ]
+}

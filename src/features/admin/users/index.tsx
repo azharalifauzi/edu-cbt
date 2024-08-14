@@ -1,4 +1,4 @@
-import AdminLayout from '@/components/admin-layout'
+import AdminLayout from '@/features/admin/components/admin-layout'
 import Pagination from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'

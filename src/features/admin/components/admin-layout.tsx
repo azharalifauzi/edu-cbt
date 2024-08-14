@@ -1,8 +1,12 @@
 import { useUser } from '@/hooks/user'
 import React, { useState } from 'react'
-import Link from './link'
-import { AvatarImage, Avatar, AvatarFallback } from './ui/avatar'
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
+import Link from '@/components/link'
+import { AvatarImage, Avatar, AvatarFallback } from '@/components/ui/avatar'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { client } from '@/utils/fetcher'
 import { cn, navigate } from '@/utils'
 import AccountSettings from './account-settings'

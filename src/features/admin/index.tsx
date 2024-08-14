@@ -1,4 +1,4 @@
-import AdminLayout from '@/components/admin-layout'
+import AdminLayout from '@/features/admin/components/admin-layout'
 import { withGlobalProviders } from '@/components/providers'
 import { useUser } from '@/hooks/user'
 

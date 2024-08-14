@@ -1,13 +1,4 @@
-import {
-  and,
-  count,
-  countDistinct,
-  desc,
-  eq,
-  getTableColumns,
-  ilike,
-  sql,
-} from 'drizzle-orm'
+import { and, count, desc, eq, getTableColumns, gte, ilike } from 'drizzle-orm'
 import { db } from '../lib/db'
 import {
   courseAnswerOptions,
@@ -22,6 +13,7 @@ import {
   jsonAggBuildObjectOrEmptyArray,
   jsonBuildObject,
 } from '../utils/drizzle'
+import dayjs from 'dayjs'
 
 export const getCourseById = async (id: number) => {
   const course = await db
@@ -62,9 +54,60 @@ interface GetCourseParams {
   search?: string
 }
 
+export const getCourses = async ({
+  page = 1,
+  search,
+  size = 10,
+  isPublished,
+}: GetCourseParams & { isPublished?: boolean } = {}) => {
+  const skip = (page - 1) * size
+
+  const totalCount = await db
+    .select({
+      count: count(),
+    })
+    .from(courses)
+
+  const data = await db
+    .select({
+      ...getTableColumns(courses),
+      teachers: jsonAggBuildObjectOrEmptyArray(users, {
+        id: users.id,
+        name: users.name,
+        image: users.image,
+      }),
+    })
+    .from(courses)
+    .leftJoin(teachersToCourses, eq(teachersToCourses.courseId, courses.id))
+    .leftJoin(users, eq(teachersToCourses.teacherId, users.id))
+    .groupBy(courses.id)
+    .offset(skip)
+    .limit(size)
+    .where(
+      and(
+        search ? ilike(courses.name, `%${search}%`) : undefined,
+        isPublished
+          ? gte(courses.publishedAt, dayjs().toISOString())
+          : undefined
+      )
+    )
+  const pageCount = Math.ceil(totalCount[0].count / size)
+
+  return {
+    pageCount,
+    data,
+    totalCount: totalCount[0].count,
+  }
+}
+
 export const getCoursesByStudentId = async (
   userId: number,
-  { page = 1, size = 10, search }: GetCourseParams = {}
+  {
+    page = 1,
+    size = 10,
+    search,
+    courseId,
+  }: GetCourseParams & { courseId?: number } = {}
 ) => {
   const skip = (page - 1) * size
 
@@ -79,21 +122,18 @@ export const getCoursesByStudentId = async (
 
   const data = await db
     .select({
-      ...getTableColumns(courses),
-      joinedAt: studentsToCourses.joinedAt,
-      finishedAt: studentsToCourses.finishedAt,
+      ...getTableColumns(studentsToCourses),
+      courseData: jsonBuildObject(getTableColumns(courses)),
     })
-    .from(courses)
-    .leftJoin(studentsToCourses, eq(studentsToCourses.courseId, courses.id))
-    .leftJoin(users, eq(studentsToCourses.studentId, users.id))
-    .groupBy(courses.id)
+    .from(studentsToCourses)
+    .leftJoin(courses, eq(courses.id, studentsToCourses.courseId))
     .limit(size)
     .offset(skip)
-    .orderBy(desc(studentsToCourses.joinedAt))
     .where(
       and(
-        eq(users.id, userId),
-        search ? ilike(courses.name, `%${search}%`) : undefined
+        eq(studentsToCourses.studentId, userId),
+        search ? ilike(courses.name, `%${search}%`) : undefined,
+        courseId ? eq(studentsToCourses.courseId, courseId) : undefined
       )
     )
 
@@ -159,23 +199,24 @@ export const getStudentsByCourseId = async (id: number) => {
 export const getStudentAnswer = async (userId: number, courseId: number) => {
   const answers = await db
     .select({
-      answerId: studentsToAnswers.answerId,
-      questionId: studentsToAnswers.questionId,
-      answer: jsonBuildObject({
+      ...getTableColumns(courseQuestions),
+      optionData: jsonAggBuildObjectOrEmptyArray(courseAnswerOptions, {
+        id: courseAnswerOptions.id,
         value: courseAnswerOptions.value,
       }),
-      question: jsonBuildObject({
-        value: courseQuestions.question,
-      }),
+      studentAnswer: jsonAggBuildObjectOrEmptyArray(
+        studentsToAnswers,
+        getTableColumns(studentsToAnswers)
+      ),
     })
-    .from(studentsToAnswers)
+    .from(courseQuestions)
     .leftJoin(
-      courseQuestions,
-      eq(studentsToAnswers.questionId, courseQuestions.id)
+      studentsToAnswers,
+      eq(courseQuestions.id, studentsToAnswers.questionId)
     )
     .leftJoin(
       courseAnswerOptions,
-      eq(courseQuestions.id, courseAnswerOptions.id)
+      eq(studentsToAnswers.answerId, courseAnswerOptions.id)
     )
     .where(
       and(
@@ -214,7 +255,7 @@ export const getQuestionsByCourseId = async (
       eq(courseQuestions.id, courseAnswerOptions.questionId)
     )
     .groupBy(courseQuestions.id)
-    .where(eq(courseQuestions.id, courseId))
+    .where(eq(courseQuestions.courseId, courseId))
 
   return questions
 }
@@ -223,7 +264,7 @@ export const isJoinedCourse = async (courseId: number, userId: number) => {
   return (
     (
       await db
-        .select()
+        .select({ courseId: studentsToCourses.courseId })
         .from(studentsToCourses)
         .where(
           and(
@@ -235,25 +276,59 @@ export const isJoinedCourse = async (courseId: number, userId: number) => {
   )
 }
 
+export const isCourseStarted = async (courseId: number, userId: number) => {
+  const course = await db
+    .select({
+      courseId: studentsToCourses.courseId,
+      isStarted: studentsToCourses.isStarted,
+    })
+    .from(studentsToCourses)
+    .where(
+      and(
+        eq(studentsToCourses.courseId, courseId),
+        eq(studentsToCourses.studentId, userId)
+      )
+    )
+
+  return !!course[0].isStarted
+}
+
 export const getStudentRapport = async (courseId: number, userId: number) => {
-  const questions = await getQuestionsByCourseId(courseId, {
-    correctFlag: 'include',
-  })
-  const answers = await getStudentAnswer(userId, courseId)
+  const rapport = await db
+    .select({
+      ...getTableColumns(courseQuestions),
+      optionData: jsonAggBuildObjectOrEmptyArray(
+        courseAnswerOptions,
+        getTableColumns(courseAnswerOptions)
+      ),
+      studentAnswer: jsonAggBuildObjectOrEmptyArray(
+        studentsToAnswers,
+        getTableColumns(studentsToAnswers)
+      ),
+    })
+    .from(courseQuestions)
+    .leftJoin(
+      studentsToAnswers,
+      eq(courseQuestions.id, studentsToAnswers.questionId)
+    )
+    .leftJoin(
+      courseAnswerOptions,
+      eq(studentsToAnswers.answerId, courseAnswerOptions.id)
+    )
+    .where(
+      and(
+        eq(studentsToAnswers.studentId, userId),
+        eq(courseQuestions.courseId, courseId),
+        eq(courseAnswerOptions.id, studentsToAnswers.answerId)
+      )
+    )
+    .groupBy(courseQuestions.id)
 
-  const rapport = questions.map((q) => {
-    const answer = answers.find((a) => a.questionId === q.id)
-    const correctAnswer = q.answerOptions.find((o) => o.isCorrect)
-    const isCorrect = answer?.answerId == correctAnswer?.id
-
-    return {
-      isCorrect,
-      questionId: q.id,
-      question: q.question,
-      answer: answer?.answer.value,
-      answerId: answer?.answerId,
-    }
-  })
-
-  return rapport
+  return rapport.map((r) => ({
+    isCorrect: r.optionData[0].isCorrect,
+    questionId: r.id,
+    question: r.question,
+    answerId: r.optionData[0].id,
+    answer: r.optionData[0].value,
+  }))
 }

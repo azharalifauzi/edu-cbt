@@ -1,0 +1,77 @@
+{
+  "id": 1,
+  "topic": "Historical Events",
+  "category": "history",
+  "image": "https://www.usatoday.com/gcdn/media/2020/08/30/USATODAY/usatsports/247WallSt.com-247WS-731827-imageforentry5310.jpg?width=700&height=394&fit=crop&format=pjpg&auto=webp",
+  "questions": [
+    {
+      "question": "In which year did the Titanic sink?",
+      "options": [
+        { "value": "1912", "isCorrect": true },
+        { "value": "1905", "isCorrect": false },
+        { "value": "1923", "isCorrect": false },
+        { "value": "1898", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Who was the first President of the United States?",
+      "options": [
+        { "value": "George Washington", "isCorrect": true },
+        { "value": "Thomas Jefferson", "isCorrect": false },
+        { "value": "Abraham Lincoln", "isCorrect": false },
+        { "value": "John Adams", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Which event marked the beginning of World War II?",
+      "options": [
+        { "value": "The invasion of Poland by Germany", "isCorrect": true },
+        { "value": "The sinking of the Lusitania", "isCorrect": false },
+        { "value": "The attack on Pearl Harbor", "isCorrect": false },
+        {
+          "value": "The signing of the Treaty of Versailles",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "What was the primary cause of the French Revolution?",
+      "options": [
+        { "value": "Economic hardship and inequality", "isCorrect": true },
+        { "value": "Religious conflict", "isCorrect": false },
+        { "value": "Colonial expansion", "isCorrect": false },
+        { "value": "Technological advancements", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Which empire was led by Genghis Khan?",
+      "options": [
+        { "value": "The Mongol Empire", "isCorrect": true },
+        { "value": "The Ottoman Empire", "isCorrect": false },
+        { "value": "The Roman Empire", "isCorrect": false },
+        { "value": "The Byzantine Empire", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "What was the main purpose of the Berlin Wall?",
+      "options": [
+        { "value": "To separate East and West Berlin", "isCorrect": true },
+        {
+          "value": "To protect the city from natural disasters",
+          "isCorrect": false
+        },
+        { "value": "To mark the boundary of East Germany", "isCorrect": false },
+        { "value": "To celebrate the division of Germany", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Who was the leader of the Soviet Union during World War II?",
+      "options": [
+        { "value": "Joseph Stalin", "isCorrect": true },
+        { "value": "Vladimir Lenin", "isCorrect": false },
+        { "value": "Leon Trotsky", "isCorrect": false },
+        { "value": "Nikita Khrushchev", "isCorrect": false }
+      ]
+    }
+  ]
+}

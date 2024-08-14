@@ -1,0 +1,53 @@
+{
+  "id": 4,
+  "topic": "Biology: Respiratory System",
+  "category": "biology",
+  "image": "https://openmd.com/images/illustrations/respiratory-system.png",
+  "questions": [
+    {
+      "question": "What is the primary muscle involved in breathing?",
+      "options": [
+        { "value": "Diaphragm", "isCorrect": true },
+        { "value": "Liver", "isCorrect": false },
+        { "value": "Heart", "isCorrect": false },
+        { "value": "Stomach", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Which structure in the respiratory system is responsible for gas exchange?",
+      "options": [
+        { "value": "Alveoli", "isCorrect": true },
+        { "value": "Bronchi", "isCorrect": false },
+        { "value": "Trachea", "isCorrect": false },
+        { "value": "Larynx", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Which organ is primarily responsible for oxygenating blood?",
+      "options": [
+        { "value": "Lungs", "isCorrect": true },
+        { "value": "Kidneys", "isCorrect": false },
+        { "value": "Liver", "isCorrect": false },
+        { "value": "Spleen", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "What part of the respiratory system is also known as the windpipe?",
+      "options": [
+        { "value": "Trachea", "isCorrect": true },
+        { "value": "Esophagus", "isCorrect": false },
+        { "value": "Bronchi", "isCorrect": false },
+        { "value": "Pharynx", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Which part of the brain regulates the rate of breathing?",
+      "options": [
+        { "value": "Medulla oblongata", "isCorrect": true },
+        { "value": "Cerebellum", "isCorrect": false },
+        { "value": "Cerebrum", "isCorrect": false },
+        { "value": "Hypothalamus", "isCorrect": false }
+      ]
+    }
+  ]
+}

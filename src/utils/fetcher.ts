@@ -27,4 +27,9 @@ export enum QueryKey {
   UserRoles = 'user-roles',
   AllRoles = 'all-roles',
   AllOrganizations = 'all-organizations',
+  CourseCategories = 'course-categories',
+  Courses = 'courses',
+  MyCourses = 'my-courses',
+  Questions = 'questions',
+  Answers = 'answers',
 }

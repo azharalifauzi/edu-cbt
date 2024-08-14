@@ -1,0 +1,13 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import TestCompFeature from '@/features/courses/test-comp'
+---
+
+<Layout>
+  <TestCompFeature
+    client:load
+    params={Astro.params}
+    url={Astro.url}
+    user={Astro.locals.user}
+  />
+</Layout>

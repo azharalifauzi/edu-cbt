@@ -1,6 +1,6 @@
 {
-  "id": "5479cbce-41c7-4cda-a473-a854772df42d",
-  "prevId": "b1110317-28f5-43eb-bd18-0e00302879b1",
+  "id": "55a014a5-9ff8-4f91-8ebe-3888b8c1bf70",
+  "prevId": "12945720-409a-4bc7-ac3b-e5c9ae255211",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -176,7 +176,7 @@
           "name": "is_correct",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": false
         }
       },
@@ -214,12 +214,26 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "course_categories_slug_unique": {
+          "name": "course_categories_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      }
     },
     "public.course_questions": {
       "name": "course_questions",
@@ -296,6 +310,34 @@
           "type": "serial",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "test_duration": {
+          "name": "test_duration",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
         }
       },
       "indexes": {},
@@ -652,8 +694,8 @@
       "name": "students_to_answers",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
+        "student_id": {
+          "name": "student_id",
           "type": "serial",
           "primaryKey": false,
           "notNull": true
@@ -669,16 +711,30 @@
           "type": "serial",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "students_to_answers_id_users_id_fk": {
-          "name": "students_to_answers_id_users_id_fk",
+        "students_to_answers_student_id_users_id_fk": {
+          "name": "students_to_answers_student_id_users_id_fk",
           "tableFrom": "students_to_answers",
           "tableTo": "users",
           "columnsFrom": [
-            "id"
+            "student_id"
           ],
           "columnsTo": [
             "id"
@@ -699,10 +755,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "students_to_answers_answer_id_course_questions_id_fk": {
-          "name": "students_to_answers_answer_id_course_questions_id_fk",
+        "students_to_answers_answer_id_course_answer_options_id_fk": {
+          "name": "students_to_answers_answer_id_course_answer_options_id_fk",
           "tableFrom": "students_to_answers",
-          "tableTo": "course_questions",
+          "tableTo": "course_answer_options",
           "columnsFrom": [
             "answer_id"
           ],
@@ -714,10 +770,10 @@
         }
       },
       "compositePrimaryKeys": {
-        "students_to_answers_id_question_id_answer_id_pk": {
-          "name": "students_to_answers_id_question_id_answer_id_pk",
+        "students_to_answers_student_id_question_id_answer_id_pk": {
+          "name": "students_to_answers_student_id_question_id_answer_id_pk",
           "columns": [
-            "id",
+            "student_id",
             "question_id",
             "answer_id"
           ]
@@ -740,6 +796,44 @@
           "type": "serial",
           "primaryKey": false,
           "notNull": true
+        },
+        "joined_at": {
+          "name": "joined_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_passed": {
+          "name": "is_passed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_started": {
+          "name": "is_started",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},

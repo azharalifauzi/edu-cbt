@@ -1,4 +1,4 @@
-import AdminLayout from '@/components/admin-layout'
+import AdminLayout from '@/features/admin/components/admin-layout'
 import { Button } from '@/components/ui/button'
 import PermissionTable from './components/table'
 import PermissionForm from './components/form'

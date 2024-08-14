@@ -1,4 +1,4 @@
-import AdminLayout from '@/components/admin-layout'
+import AdminLayout from '@/features/admin/components/admin-layout'
 import { Button } from '@/components/ui/button'
 import RoleTable from './components/table'
 import RoleForm from './components/form'

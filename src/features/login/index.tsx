@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { client } from '@/utils/fetcher'
+import { client, unwrapResponse } from '@/utils/fetcher'
 import { useMutation } from '@tanstack/react-query'
 import { withGlobalProviders } from '@/components/providers'
 
@@ -30,16 +30,11 @@ const SignInPage = () => {
 
   const submitMutation = useMutation({
     mutationFn: async (data: Data) => {
-      const res = await client.api.v1.user['sign-in'].$post({
+      const res = client.api.v1.user['sign-in'].$post({
         json: data,
       })
 
-      if (!res.ok) {
-        setError('password', {
-          message: 'Invalid credentials',
-        })
-        return
-      }
+      await unwrapResponse(res)
 
       clearErrors('password')
       window.location.reload()

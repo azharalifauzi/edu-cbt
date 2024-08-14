@@ -1,5 +1,5 @@
 {
-  "id": "b1110317-28f5-43eb-bd18-0e00302879b1",
+  "id": "12945720-409a-4bc7-ac3b-e5c9ae255211",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -150,6 +150,215 @@
         }
       }
     },
+    "public.course_answer_options": {
+      "name": "course_answer_options",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_correct": {
+          "name": "is_correct",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "course_answer_options_question_id_course_questions_id_fk": {
+          "name": "course_answer_options_question_id_course_questions_id_fk",
+          "tableFrom": "course_answer_options",
+          "tableTo": "course_questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.course_categories": {
+      "name": "course_categories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "course_categories_slug_unique": {
+          "name": "course_categories_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      }
+    },
+    "public.course_questions": {
+      "name": "course_questions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "question": {
+          "name": "question",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "course_questions_course_id_courses_id_fk": {
+          "name": "course_questions_course_id_courses_id_fk",
+          "tableFrom": "course_questions",
+          "tableTo": "courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.courses": {
+      "name": "courses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "test_duration": {
+          "name": "test_duration",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "courses_category_id_course_categories_id_fk": {
+          "name": "courses_category_id_course_categories_id_fk",
+          "tableFrom": "courses",
+          "tableTo": "course_categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "public.organizations": {
       "name": "organizations",
       "schema": "",
@@ -245,8 +454,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
+        "permission_id": {
+          "name": "permission_id",
           "type": "serial",
           "primaryKey": false,
           "notNull": true
@@ -267,12 +476,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "permissionsToRoles_user_id_permissions_id_fk": {
-          "name": "permissionsToRoles_user_id_permissions_id_fk",
+        "permissionsToRoles_permission_id_permissions_id_fk": {
+          "name": "permissionsToRoles_permission_id_permissions_id_fk",
           "tableFrom": "permissionsToRoles",
           "tableTo": "permissions",
           "columnsFrom": [
-            "user_id"
+            "permission_id"
           ],
           "columnsTo": [
             "id"
@@ -282,11 +491,11 @@
         }
       },
       "compositePrimaryKeys": {
-        "permissionsToRoles_role_id_user_id_pk": {
-          "name": "permissionsToRoles_role_id_user_id_pk",
+        "permissionsToRoles_role_id_permission_id_pk": {
+          "name": "permissionsToRoles_role_id_permission_id_pk",
           "columns": [
             "role_id",
-            "user_id"
+            "permission_id"
           ]
         }
       },
@@ -326,6 +535,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "assigned_on_signup": {
+          "name": "assigned_on_signup",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         }
       },
       "indexes": {},
@@ -473,6 +689,249 @@
           ]
         }
       }
+    },
+    "public.students_to_answers": {
+      "name": "students_to_answers",
+      "schema": "",
+      "columns": {
+        "student_id": {
+          "name": "student_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question_id": {
+          "name": "question_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "answer_id": {
+          "name": "answer_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "students_to_answers_student_id_users_id_fk": {
+          "name": "students_to_answers_student_id_users_id_fk",
+          "tableFrom": "students_to_answers",
+          "tableTo": "users",
+          "columnsFrom": [
+            "student_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "students_to_answers_question_id_course_questions_id_fk": {
+          "name": "students_to_answers_question_id_course_questions_id_fk",
+          "tableFrom": "students_to_answers",
+          "tableTo": "course_questions",
+          "columnsFrom": [
+            "question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "students_to_answers_answer_id_course_questions_id_fk": {
+          "name": "students_to_answers_answer_id_course_questions_id_fk",
+          "tableFrom": "students_to_answers",
+          "tableTo": "course_questions",
+          "columnsFrom": [
+            "answer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "students_to_answers_student_id_question_id_answer_id_pk": {
+          "name": "students_to_answers_student_id_question_id_answer_id_pk",
+          "columns": [
+            "student_id",
+            "question_id",
+            "answer_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.students_to_courses": {
+      "name": "students_to_courses",
+      "schema": "",
+      "columns": {
+        "student_id": {
+          "name": "student_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "joined_at": {
+          "name": "joined_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_passed": {
+          "name": "is_passed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_started": {
+          "name": "is_started",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "students_to_courses_student_id_users_id_fk": {
+          "name": "students_to_courses_student_id_users_id_fk",
+          "tableFrom": "students_to_courses",
+          "tableTo": "users",
+          "columnsFrom": [
+            "student_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "students_to_courses_course_id_courses_id_fk": {
+          "name": "students_to_courses_course_id_courses_id_fk",
+          "tableFrom": "students_to_courses",
+          "tableTo": "courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "students_to_courses_student_id_course_id_pk": {
+          "name": "students_to_courses_student_id_course_id_pk",
+          "columns": [
+            "student_id",
+            "course_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.teachers_to_courses": {
+      "name": "teachers_to_courses",
+      "schema": "",
+      "columns": {
+        "teacher_id": {
+          "name": "teacher_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "teachers_to_courses_teacher_id_users_id_fk": {
+          "name": "teachers_to_courses_teacher_id_users_id_fk",
+          "tableFrom": "teachers_to_courses",
+          "tableTo": "users",
+          "columnsFrom": [
+            "teacher_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "teachers_to_courses_course_id_courses_id_fk": {
+          "name": "teachers_to_courses_course_id_courses_id_fk",
+          "tableFrom": "teachers_to_courses",
+          "tableTo": "courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "teachers_to_courses_teacher_id_course_id_pk": {
+          "name": "teachers_to_courses_teacher_id_course_id_pk",
+          "columns": [
+            "teacher_id",
+            "course_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
     },
     "public.users": {
       "name": "users",

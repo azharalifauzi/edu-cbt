@@ -17,10 +17,13 @@ import slugify from 'slugify'
 import { generateJsonResponse } from '../lib/response'
 import {
   getCourseById,
+  getCourses,
   getCoursesByStudentId,
   getCoursesByTeacherId,
   getQuestionsByCourseId,
+  getStudentAnswer,
   getStudentRapport,
+  isCourseStarted,
   isJoinedCourse,
 } from '../services/courses'
 import { ServerError } from '../lib/error'
@@ -29,6 +32,58 @@ import { jsonAggBuildObjectOrEmptyArray } from '../utils/drizzle'
 import dayjs from 'dayjs'
 
 const app = new Hono()
+  .get(
+    '/categories',
+    authMiddleware(),
+    zValidator(
+      'param',
+      z.object({
+        page: z.number({ coerce: true }).optional(),
+        size: z.number({ coerce: true }).optional(),
+      })
+    ),
+    async (c) => {
+      const { page = 1, size = 10 } = c.req.valid('param')
+      const skip = (page - 1) * size
+
+      const [{ categories, totalCount }] = await db
+        .select({
+          totalCount: count(),
+          categories: jsonAggBuildObjectOrEmptyArray(
+            courseCategories,
+            getTableColumns(courseCategories)
+          ),
+        })
+        .from(courseCategories)
+        .limit(size)
+        .offset(skip)
+
+      const pageCount = Math.ceil(totalCount / size)
+
+      return generateJsonResponse(c, {
+        pageCount,
+        totalCount,
+        data: categories,
+      })
+    }
+  )
+  .get(
+    '/',
+    authMiddleware(),
+    zValidator(
+      'param',
+      z.object({
+        page: z.number({ coerce: true }).optional(),
+        size: z.number({ coerce: true }).optional(),
+        search: z.string().optional(),
+      })
+    ),
+    async (c) => {
+      const courses = await getCourses(c.req.valid('param'))
+
+      return generateJsonResponse(c, courses)
+    }
+  )
   .post(
     '/',
     authMiddleware({
@@ -284,6 +339,12 @@ const app = new Hono()
       throw new ServerError(null, 401, "You aren't joined to this course")
     }
 
+    const isStarted = await isCourseStarted(courseId, c.get('userId'))
+
+    if (isStarted) {
+      throw new ServerError(null, 400, 'You already started the course')
+    }
+
     await db.update(studentsToCourses).set({
       startedAt: dayjs().toISOString(),
     })
@@ -300,11 +361,21 @@ const app = new Hono()
 
     const rapport = await getStudentRapport(courseId, c.get('userId'))
 
-    await db.update(studentsToCourses).set({
-      finishedAt: dayjs().toISOString(),
-      isPassed: rapport.every((r) => r.isCorrect),
-      score: rapport.filter((r) => r.isCorrect).length,
-    })
+    await db
+      .update(studentsToCourses)
+      .set({
+        finishedAt: dayjs().toISOString(),
+        isPassed: rapport.every((r) => r.isCorrect),
+        score: rapport.filter((r) => r.isCorrect).length,
+      })
+      .where(
+        and(
+          eq(studentsToCourses.studentId, c.get('userId')),
+          eq(studentsToCourses.courseId, courseId)
+        )
+      )
+
+    return generateJsonResponse(c)
   })
   .post(
     '/:id/answer',
@@ -319,18 +390,7 @@ const app = new Hono()
     async (c) => {
       const courseId = Number(c.req.param('id'))
 
-      const isJoined =
-        (
-          await db
-            .select()
-            .from(studentsToCourses)
-            .where(
-              and(
-                eq(studentsToCourses.courseId, courseId),
-                eq(studentsToCourses.studentId, c.get('userId'))
-              )
-            )
-        ).length > 0
+      const isJoined = isJoinedCourse(courseId, c.get('userId'))
 
       if (!isJoined) {
         throw new ServerError(null, 401, "You aren't joined to this course")
@@ -338,22 +398,40 @@ const app = new Hono()
 
       const body = c.req.valid('json')
 
-      await db
-        .insert(studentsToAnswers)
-        .values({
-          ...body,
-          studentId: c.get('userId'),
-        })
-        .onConflictDoUpdate({
-          target: [
-            studentsToAnswers.questionId,
-            studentsToAnswers.answerId,
-            studentsToAnswers.studentId,
-          ],
-          set: {
+      const hasAnswered =
+        (
+          await db
+            .select()
+            .from(studentsToAnswers)
+            .where(
+              and(
+                eq(studentsToAnswers.questionId, body.questionId),
+                eq(studentsToAnswers.studentId, c.get('userId'))
+              )
+            )
+        ).length > 0
+
+      if (hasAnswered) {
+        await db
+          .update(studentsToAnswers)
+          .set({
             answerId: body.answerId,
-          },
-        })
+            updatedAt: dayjs().toISOString(),
+          })
+          .where(
+            and(
+              eq(studentsToAnswers.questionId, body.questionId),
+              eq(studentsToAnswers.studentId, c.get('userId'))
+            )
+          )
+
+        return generateJsonResponse(c)
+      }
+
+      await db.insert(studentsToAnswers).values({
+        ...body,
+        studentId: c.get('userId'),
+      })
 
       return generateJsonResponse(c)
     }
@@ -378,6 +456,14 @@ const app = new Hono()
       return generateJsonResponse(c, courses)
     }
   )
+  .get('/my-courses/:courseId', authMiddleware(), async (c) => {
+    const courseId = Number(c.req.param('courseId'))
+    const courses = await getCoursesByStudentId(c.get('userId'), {
+      courseId,
+    })
+
+    return generateJsonResponse(c, courses.data[0])
+  })
   .get(
     '/teacher/my-courses',
     authMiddleware({ permission: ['write:courses'] }),
@@ -519,6 +605,12 @@ const app = new Hono()
 
     return generateJsonResponse(c, questions)
   })
+  .get('/:id/answers', authMiddleware(), async (c) => {
+    const id = Number(c.req.param('id'))
+    const answers = await getStudentAnswer(c.get('userId'), id)
+
+    return generateJsonResponse(c, answers)
+  })
   .get('/:id/rapport', authMiddleware(), async (c) => {
     const id = Number(c.req.param('id'))
 
@@ -584,41 +676,6 @@ const app = new Hono()
       await db.delete(courseCategories).where(eq(courseCategories.id, id))
 
       return generateJsonResponse(c)
-    }
-  )
-  .get(
-    '/categories',
-    authMiddleware(),
-    zValidator(
-      'param',
-      z.object({
-        page: z.number({ coerce: true }).optional().default(1),
-        size: z.number({ coerce: true }).optional().default(10),
-      })
-    ),
-    async (c) => {
-      const { page, size } = c.req.valid('param')
-      const skip = (page - 1) * size
-
-      const [{ categories, totalCount }] = await db
-        .select({
-          totalCount: count(),
-          categories: jsonAggBuildObjectOrEmptyArray(
-            courseCategories,
-            getTableColumns(courseCategories)
-          ),
-        })
-        .from(courseCategories)
-        .limit(size)
-        .offset(skip)
-
-      const pageCount = Math.ceil(totalCount / size)
-
-      return generateJsonResponse(c, {
-        pageCount,
-        totalCount,
-        data: categories,
-      })
     }
   )
 

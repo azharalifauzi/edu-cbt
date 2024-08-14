@@ -1,0 +1,13 @@
+---
+import NewCourseFeature from '@/features/course-management/new'
+import Layout from '@/layouts/Layout.astro'
+---
+
+<Layout>
+  <NewCourseFeature
+    client:load
+    params={Astro.params}
+    url={Astro.url}
+    user={Astro.locals.user}
+  />
+</Layout>

@@ -1,5 +1,5 @@
 import { Trash2, Upload, User2 } from 'lucide-react'
-import { Dialog, DialogContent } from './ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useUser } from '@/hooks/user'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -11,9 +11,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from './ui/form'
-import { Input } from './ui/input'
-import { Button } from './ui/button'
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { useMutation } from '@tanstack/react-query'
 import { client, unwrapResponse } from '@/utils/fetcher'
 import React from 'react'

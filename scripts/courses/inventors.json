@@ -1,0 +1,62 @@
+{
+  "id": 2,
+  "topic": "Inventors and Their Inventions",
+  "category": "history",
+  "image": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQeyrzfaBAwvJi56Qd3vhroq7TfLBhcHrjD0fDnisucZCXrfEZ7JtmifakNAtEqOQ25RmyBQ21I324v--wiinRvO5FVZ1ceUZA4rqXxKA",
+  "questions": [
+    {
+      "question": "Who invented the telephone?",
+      "options": [
+        { "value": "Alexander Graham Bell", "isCorrect": true },
+        { "value": "Thomas Edison", "isCorrect": false },
+        { "value": "Nikola Tesla", "isCorrect": false },
+        { "value": "Guglielmo Marconi", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Who is credited with inventing the light bulb?",
+      "options": [
+        { "value": "Thomas Edison", "isCorrect": true },
+        { "value": "Benjamin Franklin", "isCorrect": false },
+        { "value": "Michael Faraday", "isCorrect": false },
+        { "value": "James Watt", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Who invented the World Wide Web?",
+      "options": [
+        { "value": "Tim Berners-Lee", "isCorrect": true },
+        { "value": "Bill Gates", "isCorrect": false },
+        { "value": "Steve Jobs", "isCorrect": false },
+        { "value": "Larry Page", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Who invented the first successful airplane?",
+      "options": [
+        { "value": "Wright Brothers", "isCorrect": true },
+        { "value": "Leonardo da Vinci", "isCorrect": false },
+        { "value": "Amelia Earhart", "isCorrect": false },
+        { "value": "Charles Lindbergh", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Who is known for inventing the first practical automobile?",
+      "options": [
+        { "value": "Karl Benz", "isCorrect": true },
+        { "value": "Henry Ford", "isCorrect": false },
+        { "value": "Rudolf Diesel", "isCorrect": false },
+        { "value": "Enzo Ferrari", "isCorrect": false }
+      ]
+    },
+    {
+      "question": "Who invented the polio vaccine?",
+      "options": [
+        { "value": "Jonas Salk", "isCorrect": true },
+        { "value": "Alexander Fleming", "isCorrect": false },
+        { "value": "Edward Jenner", "isCorrect": false },
+        { "value": "Louis Pasteur", "isCorrect": false }
+      ]
+    }
+  ]
+}

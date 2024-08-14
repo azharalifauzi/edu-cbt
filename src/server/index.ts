@@ -7,6 +7,7 @@ import organization from './routes/organization'
 import blogs from './routes/blog'
 import files from './routes/file'
 import geolocation from './routes/geolocation'
+import courses from './routes/courses'
 import { logger } from './middlewares/logger'
 import { ServerError } from './lib/error'
 import { secureHeaders } from 'hono/secure-headers'
@@ -32,10 +33,15 @@ const apiRoutes = app
   .route('/blog', blogs)
   .route('/file', files)
   .route('/geolocation', geolocation)
+  .route('/course', courses)
 
-app.get('/healthcheck', (c) => c.json({ message: 'OK' }))
+app.get('/api/v1/healthcheck', (c) => c.json({ message: 'OK' }))
 
 app.onError(async (err, c) => {
+  if (!isProduction) {
+    console.log(err)
+  }
+
   if (err instanceof ServerError) {
     const error = err as InstanceType<typeof ServerError>
     return c.json(error.response, error.response.statusCode)

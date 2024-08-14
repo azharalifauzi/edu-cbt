@@ -9,9 +9,7 @@ import node from '@astrojs/node'
 export default defineConfig({
   output: 'server',
   integrations: [
-    react({
-      experimentalReactChildren: true,
-    }),
+    react(),
     tailwind({
       applyBaseStyles: false,
     }),

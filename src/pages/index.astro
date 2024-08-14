@@ -1,7 +1,13 @@
 ---
+import OverviewFeature from '@/features/overview'
 import Layout from '../layouts/Layout.astro'
 ---
 
 <Layout title="Welcome to Astro." description="Halo">
-  <main>Hello World</main>
+  <OverviewFeature
+    client:load
+    params={Astro.params}
+    url={Astro.url}
+    user={Astro.locals.user}
+  />
 </Layout>

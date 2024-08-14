@@ -21,8 +21,7 @@ RUN bun b
 
 # copy production dependencies and source code into final image
 FROM base AS release
-COPY --from=install /temp/dev/node_modules node_modules
-COPY --from=prerelease /usr/src/app/dist ./dist
+COPY --from=prerelease /usr/src/app .
 
 # required for bcryptjs
 RUN apk add libstdc++

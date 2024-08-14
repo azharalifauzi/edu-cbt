@@ -24,6 +24,9 @@ FROM base AS release
 COPY --from=install /temp/dev/node_modules node_modules
 COPY --from=prerelease /usr/src/app/dist ./dist
 
+# required for bcryptjs
+RUN apk add libstdc++
+
 # run the app
 ENV HOST=0.0.0.0
 ENV PORT=4321

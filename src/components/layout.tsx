@@ -5,6 +5,7 @@ import { BookOpen, Home, LogOut, School } from 'lucide-react'
 import { client } from '@/utils/fetcher'
 import { useUser } from '@/hooks/user'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { LogoEduCBT } from '@/assets'
 
 const sidebarList = [
   {
@@ -49,7 +50,8 @@ const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         </div>
       </header>
       <div className="fixed top-0 left-0 bottom-0 w-[270px] bg-gray-100">
-        <div className="h-[92px] flex items-center font-extrabold px-6 text-2xl justify-center">
+        <div className="h-[92px] flex items-center font-extrabold px-6 text-xl justify-center">
+          <LogoEduCBT className="h-8 w-8 mr-1 text-purple-700" />
           EduCBT
         </div>
         <div className="mt-1 px-6">

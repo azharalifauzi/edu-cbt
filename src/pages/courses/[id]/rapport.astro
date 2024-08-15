@@ -17,6 +17,10 @@ const rapport = await getStudentRapport(courseId, user.id)
 const {
   data: [course],
 } = await getCoursesByStudentId(user.id, { courseId })
+
+if (!course) {
+  return Astro.rewrite('/not-found')
+}
 ---
 
 <Layout>

@@ -18,6 +18,10 @@ const questions = await getQuestionsByCourseId(courseId)
 const answers = await getStudentAnswer(user.id, courseId)
 const course = (await getCoursesByStudentId(user.id, { courseId })).data[0]
 
+if (!course) {
+  return Astro.rewrite('/not-found')
+}
+
 const defaultAnswers: Record<number, number> = {}
 
 questions.forEach((q, index) => {

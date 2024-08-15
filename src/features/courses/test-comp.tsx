@@ -195,7 +195,9 @@ const TestCompFeature: React.FC<Props> = ({
             </div>
           </div>
         </div>
-
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 font-semibold bg-orange-100 text-orange-600 px-4 py-2 rounded-lg text-sm">
+          Question {currentQuestionIdx + 1} of {questions.length}
+        </div>
         <div className="flex items-center gap-2">
           <div className="text-right">
             <div className="text-xs text-gray-400">Howdy</div>

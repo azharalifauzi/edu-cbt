@@ -316,7 +316,7 @@ export const isCourseStarted = async (courseId: number, userId: number) => {
 }
 
 export const getStudentRapport = async (courseId: number, userId: number) => {
-  const rapport = await db
+  const report = await db
     .select({
       ...getTableColumns(courseQuestions),
       optionData: jsonAggBuildObjectOrEmptyArray(
@@ -349,7 +349,7 @@ export const getStudentRapport = async (courseId: number, userId: number) => {
   const allQuestions = await getQuestionsByCourseId(courseId)
 
   return allQuestions.map((q) => {
-    const answer = rapport.find((r) => r.id === q.id)
+    const answer = report.find((r) => r.id === q.id)
 
     if (!answer) {
       return {

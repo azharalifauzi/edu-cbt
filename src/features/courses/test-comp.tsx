@@ -229,7 +229,7 @@ const TestCompFeature: React.FC<Props> = ({
             career soon enough
           </div>
           <Button asChild variant="purple" className="w-44">
-            <Link to={`/courses/${id}/rapport`}>View Test Result</Link>
+            <Link to={`/courses/${id}/report`}>View Test Result</Link>
           </Button>
         </div>
       )}

@@ -1,6 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro'
-import RapportFeature from '@/features/courses/rapport'
+import RapportFeature from '@/features/courses/report'
 import {
   getCoursesByStudentId,
   getStudentRapport,
@@ -13,7 +13,7 @@ const {
 
 const courseId = Number(id!)
 
-const rapport = await getStudentRapport(courseId, user.id)
+const report = await getStudentRapport(courseId, user.id)
 const {
   data: [course],
 } = await getCoursesByStudentId(user.id, { courseId })
@@ -32,7 +32,7 @@ if (!course) {
     courseName={course.name}
     courseCatetegory={course.category.name}
     courseImage={course.image}
-    studentAnswers={rapport}
+    studentAnswers={report}
     isPassed={course.studentData.isPassed}
   />
 </Layout>

@@ -43,7 +43,7 @@ const RapportFeature: React.FC<Props> = ({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem className="font-semibold">
-            Rapport Details
+            Report Details
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

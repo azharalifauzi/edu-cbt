@@ -362,14 +362,14 @@ const app = new Hono()
       throw new ServerError(null, 401, "You aren't joined to this course")
     }
 
-    const rapport = await getStudentRapport(courseId, c.get('userId'))
+    const report = await getStudentRapport(courseId, c.get('userId'))
 
     await db
       .update(studentsToCourses)
       .set({
         finishedAt: dayjs().toISOString(),
-        isPassed: rapport.every((r) => r.isCorrect),
-        score: rapport.filter((r) => r.isCorrect).length,
+        isPassed: report.every((r) => r.isCorrect),
+        score: report.filter((r) => r.isCorrect).length,
       })
       .where(
         and(
@@ -614,7 +614,7 @@ const app = new Hono()
 
     return generateJsonResponse(c, answers)
   })
-  .get('/:id/rapport', authMiddleware(), async (c) => {
+  .get('/:id/report', authMiddleware(), async (c) => {
     const id = Number(c.req.param('id'))
 
     const isJoined =
@@ -629,9 +629,9 @@ const app = new Hono()
       throw new ServerError(null, 401, 'You are not a student of this course')
     }
 
-    const rapport = await getStudentRapport(id, c.get('userId'))
+    const report = await getStudentRapport(id, c.get('userId'))
 
-    return generateJsonResponse(c, rapport)
+    return generateJsonResponse(c, report)
   })
   .post(
     '/categories',

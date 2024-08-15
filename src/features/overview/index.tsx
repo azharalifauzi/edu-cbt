@@ -118,7 +118,7 @@ const OverviewFeature: React.FC<Props> = ({
                   if (!hasJoined) {
                     handleJoin.mutate(course.id)
                   } else if (hasFinished) {
-                    navigate(`/courses/${course.id}/rapport`)
+                    navigate(`/courses/${course.id}/report`)
                   } else {
                     navigate(`/courses/${course.id}`)
                   }
@@ -128,7 +128,7 @@ const OverviewFeature: React.FC<Props> = ({
                 })}
               >
                 {hasFinished
-                  ? 'See Rapport'
+                  ? 'See Report'
                   : hasStarted && !hasFinished
                   ? 'Continue Test'
                   : hasJoined

@@ -99,7 +99,7 @@ const columns = [
 
       return (
         <Button asChild className="mx-auto flex w-max">
-          <Link to={`/courses/${info.getValue()}/rapport`}>Rapport</Link>
+          <Link to={`/courses/${info.getValue()}/report`}>Report</Link>
         </Button>
       )
     },

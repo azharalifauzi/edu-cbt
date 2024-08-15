@@ -1,4 +1,13 @@
-import { and, count, desc, eq, getTableColumns, gte, ilike } from 'drizzle-orm'
+import {
+  and,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  gte,
+  ilike,
+  lte,
+} from 'drizzle-orm'
 import { db } from '../lib/db'
 import {
   courseAnswerOptions,
@@ -85,6 +94,8 @@ export const getCourses = async ({
       and(
         search ? ilike(courses.name, `%${search}%`) : undefined,
         isPublished
+          ? lte(courses.publishedAt, dayjs().toISOString())
+          : isPublished === false
           ? gte(courses.publishedAt, dayjs().toISOString())
           : undefined
       )

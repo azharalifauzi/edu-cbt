@@ -1,13 +1,27 @@
 ---
 import OverviewFeature from '@/features/overview'
 import Layout from '../layouts/Layout.astro'
+import { getCourses, getCoursesByStudentId } from '@/server/services/courses'
+
+const { user } = Astro.locals
+const myCourses = await getCoursesByStudentId(user.id, {
+  page: 1,
+  size: 999,
+})
+const courses = await getCourses({
+  page: 1,
+  size: 999,
+  isPublished: true,
+})
 ---
 
-<Layout title="Welcome to Astro." description="Halo">
+<Layout>
   <OverviewFeature
     client:load
     params={Astro.params}
     url={Astro.url}
     user={Astro.locals.user}
+    defaultMyCourses={myCourses.data}
+    defaultCourses={courses.data}
   />
 </Layout>

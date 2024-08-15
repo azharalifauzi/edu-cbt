@@ -4,9 +4,18 @@ import { Button } from '@/components/ui/button'
 import { cn, navigate } from '@/utils'
 import { client, QueryKey, unwrapResponse } from '@/utils/fetcher'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type React from 'react'
 import { toast } from 'sonner'
 
-const OverviewFeature = () => {
+interface Props {
+  defaultCourses: any
+  defaultMyCourses: any
+}
+
+const OverviewFeature: React.FC<Props> = ({
+  defaultCourses,
+  defaultMyCourses,
+}) => {
   const queryClient = useQueryClient()
 
   const { data: courses } = useQuery({
@@ -22,6 +31,7 @@ const OverviewFeature = () => {
       const { data } = await unwrapResponse(res)
       return data.data
     },
+    placeholderData: defaultCourses,
   })
 
   const { data: myCourses } = useQuery({
@@ -37,6 +47,7 @@ const OverviewFeature = () => {
       const { data } = await unwrapResponse(res)
       return data.data
     },
+    placeholderData: defaultMyCourses,
   })
 
   const handleJoin = useMutation({

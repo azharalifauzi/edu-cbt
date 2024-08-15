@@ -12,7 +12,11 @@ interface Props {
   className?: string
 }
 
-const { title = 'EduCBT', description, className } = Astro.props
+const {
+  title = 'EduCBT | Education Platform',
+  description = 'EduCBT, revolutionized the way teachers and students interact.',
+  className,
+} = Astro.props
 ---
 
 <!doctype html>
@@ -20,7 +24,7 @@ const { title = 'EduCBT', description, className } = Astro.props
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Astro description" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     {
@@ -39,6 +43,7 @@ const { title = 'EduCBT', description, className } = Astro.props
         </>
       )
     }
+    <meta property="og:image" content="/sign-in-illustration.png" />
     <AstroFont
       config={[
         {

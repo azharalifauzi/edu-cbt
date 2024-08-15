@@ -79,7 +79,10 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const courses = await getCourses(c.req.valid('param'))
+      const courses = await getCourses({
+        ...c.req.valid('param'),
+        isPublished: true,
+      })
 
       return generateJsonResponse(c, courses)
     }

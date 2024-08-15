@@ -110,6 +110,7 @@ const TestCompFeature: React.FC<Props> = ({
     },
     onSuccess: () => {
       setFinished(true)
+      queryClient.invalidateQueries({ queryKey: [QueryKey.MyCourses] })
     },
   })
 

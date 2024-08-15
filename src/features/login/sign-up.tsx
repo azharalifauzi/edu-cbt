@@ -128,8 +128,8 @@ const SignUpPage = () => {
             </Form>
           </div>
         </div>
-        <div className="bg-purple-700 flex items-center justify-center h-full">
-          <img src={SignInIllustration} className="max-w-[500px]" />
+        <div className="bg-purple-700 flex items-center justify-center h-full px-10">
+          <img src={SignInIllustration} className="max-w-[500px] w-full" />
         </div>
       </div>
     </main>

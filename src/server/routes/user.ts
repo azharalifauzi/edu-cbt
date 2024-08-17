@@ -10,6 +10,7 @@ import { authMiddleware } from '@/server/middlewares/auth'
 import { db } from '@/server/lib/db'
 import {
   organizations,
+  resetPasswords,
   roles,
   rolesToUsers,
   sessions,
@@ -17,7 +18,11 @@ import {
   usersToOrganizations,
 } from '@/server/models'
 import { and, count, desc, eq, getTableColumns, ilike } from 'drizzle-orm'
-import { DEFAULT_ORG_ID, SESSION_COOKIE_NAME } from '@/server/constants'
+import {
+  DEFAULT_ORG_ID,
+  isProduction,
+  SESSION_COOKIE_NAME,
+} from '@/server/constants'
 import { isEmail } from '../utils'
 import {
   createUserByEmailAndPassword,
@@ -27,6 +32,9 @@ import {
 import { jsonAggBuildObjectOrEmptyArray } from '../utils/drizzle'
 import { ServerError } from '../lib/error'
 import { generateJsonResponse } from '../lib/response'
+import crypto from 'crypto'
+import { getResetPasswordEmail } from '../email-templates/reset-password'
+import { transporter } from '../lib/email'
 
 const app = new Hono()
   .post(
@@ -461,6 +469,102 @@ const app = new Hono()
       const user = await updateUserById(id, data)
 
       return generateJsonResponse(c, user)
+    }
+  )
+  .post(
+    '/forgot-password',
+    zValidator(
+      'json',
+      z.object({
+        email: z.string().email(),
+      })
+    ),
+    async (c) => {
+      const { email } = c.req.valid('json')
+      const user = await db
+        .select({ id: users.id, email: users.email, name: users.name })
+        .from(users)
+        .where(eq(users.email, email))
+
+      if (user.length === 0) {
+        throw new ServerError(
+          null,
+          404,
+          `User with ${email} email, has never been registered.`
+        )
+      }
+
+      const token = crypto.randomBytes(32).toString('hex')
+      await db.insert(resetPasswords).values({
+        token,
+        userId: user[0].id,
+        expiredAt: dayjs().add(1, 'hour').toISOString(),
+      })
+
+      const link = `${
+        isProduction ? 'https://educbt.sidrstudio.com' : 'http://localhost:4321'
+      }/change-password?token=${token}`
+
+      const emailBody = getResetPasswordEmail(link, user[0].name)
+      await transporter.sendMail({
+        from: '"EduCBT Team" <noreply@sidrstudio.com>',
+        to: email,
+        subject: 'EduCBT: Reset password request',
+        html: emailBody,
+        headers: {
+          isTransactional: 'true',
+        },
+      })
+
+      return generateJsonResponse(c)
+    }
+  )
+  .post(
+    '/forgot-password/change',
+    zValidator(
+      'json',
+      z.object({
+        token: z.string().min(1, 'Token is required'),
+        password: z.string(),
+      })
+    ),
+    async (c) => {
+      const { password, token } = c.req.valid('json')
+
+      const resetPassword = await db
+        .select()
+        .from(resetPasswords)
+        .where(eq(resetPasswords.token, token))
+
+      if (resetPassword.length === 0) {
+        throw new ServerError(null, 400, 'Your reset password token is invalid')
+      }
+
+      const { expiredAt, userId } = resetPassword[0]
+
+      if (
+        dayjs(expiredAt.split(' ').join('T') + 'Z').isBefore(
+          dayjs(dayjs().toISOString())
+        )
+      ) {
+        throw new ServerError(
+          null,
+          400,
+          'Your reset password request is already expired.'
+        )
+      }
+      const hashedPassword = await hash(password, 16)
+
+      await db
+        .update(users)
+        .set({
+          password: hashedPassword,
+        })
+        .where(eq(users.id, userId))
+
+      await db.delete(resetPasswords).where(eq(resetPasswords.token, token))
+
+      return generateJsonResponse(c)
     }
   )
 

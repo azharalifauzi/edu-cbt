@@ -287,3 +287,13 @@ export const studentsToAnswers = pgTable(
     pk: primaryKey({ columns: [t.studentId, t.questionId, t.answerId] }),
   })
 )
+
+export const resetPasswords = pgTable('reset_passwords', {
+  id: serial('id').primaryKey(),
+  token: text('token').unique().notNull(),
+  userId: serial('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  expiredAt: timestamp('expired_at', {
+    mode: 'string',
+  }).notNull(),
+  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+})

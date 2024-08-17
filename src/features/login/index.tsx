@@ -16,6 +16,7 @@ import { useMutation } from '@tanstack/react-query'
 import { withGlobalProviders } from '@/components/providers'
 import SignInIllustration from './assets/sign-in-illustration.png?url'
 import Header from './components/header'
+import Link from '@/components/link'
 
 const formSchema = z.object({
   email: z.string({ message: 'Email is required' }).email('Email is invalid'),
@@ -62,25 +63,33 @@ const SignInPage = () => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} type="email" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="password" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div>
+                <FormField
+                  control={control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="password" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Link
+                  className="w-max ml-auto block text-sm mt-2 text-blue-500"
+                  to="/forgot-password"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Button
                 disabled={submitMutation.isPending}
                 className="mt-4"

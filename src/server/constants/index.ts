@@ -7,3 +7,7 @@ export const DO_SPACES_ENDPOINT = process.env.DO_SPACES_ENDPOINT
 export const DO_SPACES_ACCESS_KEY_ID = process.env.DO_SPACES_ACCESS_KEY_ID
 export const DO_SPACES_SECRET_KEY = process.env.DO_SPACES_SECRET_KEY
 export const BUCKET_NAME = process.env.DO_BUCKET_NAME
+export const SMTP_USERNAME = process.env.SMTP_USERNAME
+export const SMTP_PASSWORD = process.env.SMTP_PASSWORD
+export const SMTP_HOST = process.env.SMTP_HOST
+export const SMTP_PORT = Number(process.env.SMTP_PORT)

@@ -22,7 +22,7 @@ const isLoggedin = async (context: APIContext) => {
   return user
 }
 
-const publicUrl = ['/login', '/sign-up']
+const publicUrl = ['/login', '/sign-up', '/forgot-password', '/change-password']
 
 export const onRequest = defineMiddleware(async (context, next) => {
   if (context.url.pathname.startsWith('/api')) {

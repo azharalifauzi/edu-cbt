@@ -38,13 +38,13 @@ const apiRoutes = app
 app.get('/api/v1/healthcheck', (c) => c.json({ message: 'OK' }))
 
 app.onError(async (err, c) => {
-  if (!isProduction) {
-    console.log(err)
-  }
-
   if (err instanceof ServerError) {
     const error = err as InstanceType<typeof ServerError>
     return c.json(error.response, error.response.statusCode)
+  }
+
+  if (!isProduction) {
+    console.log(err)
   }
 
   if (err instanceof Error) {

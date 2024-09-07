@@ -7,6 +7,8 @@ import {
   gte,
   ilike,
   lte,
+  max,
+  min,
   sql,
 } from 'drizzle-orm'
 import { db } from '../lib/db'
@@ -338,10 +340,10 @@ export const getStudentReport = async ({
     .select({
       ...getTableColumns(courses),
       studentId,
-      joinedAt,
-      finishedAt,
-      startedAt,
-      categoryName: courseCategories.name,
+      joinedAt: min(studentsToCourses.joinedAt),
+      finishedAt: min(studentsToCourses.finishedAt),
+      startedAt: min(studentsToCourses.startedAt),
+      categoryName: max(courseCategories.name),
       totalCount: sql<number>`(
     SELECT COUNT(*) FROM ${studentsToCourses}
     WHERE ${studentsToCourses.studentId} = ${userId}
@@ -391,15 +393,7 @@ export const getStudentReport = async ({
         courseId ? eq(courses.id, courseId) : undefined
       )
     )
-    .groupBy(
-      courses.id,
-      courseCategories.name,
-      studentsToCourses.studentId,
-      studentsToCourses.joinedAt,
-      studentsToCourses.finishedAt,
-      studentsToCourses.joinedAt,
-      studentsToCourses.startedAt
-    )
+    .groupBy(courses.id, studentsToCourses.studentId)
     .limit(size)
     .offset(skip)
 

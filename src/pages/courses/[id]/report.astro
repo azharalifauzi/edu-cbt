@@ -9,7 +9,6 @@ const {
 } = Astro
 
 const courseId = Number(id!)
-
 const report = await getStudentReport({ courseId, userId: user.id })
 
 if (!report || !report.data[0].finishedAt) {
@@ -31,5 +30,7 @@ const { name, categoryName, image, questions, questionCounts, correctAnswers } =
     courseImage={image}
     studentAnswers={questions}
     isPassed={questionCounts === correctAnswers}
+    questionCount={questionCounts}
+    correctAnswer={correctAnswers}
   />
 </Layout>

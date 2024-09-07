@@ -20,7 +20,9 @@ interface Props {
     isCorrect: boolean
     id: number
   }[]
-  isPassed: boolean | null
+  isPassed: boolean
+  questionCount: number
+  correctAnswer: number
 }
 
 const RapportFeature: React.FC<Props> = ({
@@ -29,6 +31,8 @@ const RapportFeature: React.FC<Props> = ({
   courseName,
   studentAnswers,
   isPassed,
+  questionCount,
+  correctAnswer,
 }) => {
   return (
     <Layout>
@@ -64,8 +68,7 @@ const RapportFeature: React.FC<Props> = ({
               <div className="flex items-center gap-2">
                 <Calendar />
                 <span className="font-bold">
-                  {studentAnswers.filter((a) => a.isCorrect).length} of{' '}
-                  {studentAnswers.length} correct
+                  {correctAnswer} of {questionCount} correct
                 </span>
               </div>
             </div>

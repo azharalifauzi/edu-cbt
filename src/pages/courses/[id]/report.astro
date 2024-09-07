@@ -29,8 +29,8 @@ const { name, categoryName, image, questions, questionCounts, correctAnswers } =
     courseCatetegory={categoryName}
     courseImage={image}
     studentAnswers={questions}
-    isPassed={questionCounts === correctAnswers}
-    questionCount={questionCounts}
-    correctAnswer={correctAnswers}
+    isPassed={questions.every((q) => q.isCorrect)}
+    questionCount={questions.length}
+    correctAnswer={questions.filter((q) => q.isCorrect).length}
   />
 </Layout>

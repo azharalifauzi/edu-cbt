@@ -9,6 +9,7 @@ import {
   lte,
   max,
   min,
+  SQL,
   sql,
 } from 'drizzle-orm'
 import { db } from '../lib/db'
@@ -340,10 +341,10 @@ export const getStudentReport = async ({
     .select({
       ...getTableColumns(courses),
       studentId,
-      joinedAt: min(studentsToCourses.joinedAt),
-      finishedAt: min(studentsToCourses.finishedAt),
-      startedAt: min(studentsToCourses.startedAt),
-      categoryName: max(courseCategories.name),
+      joinedAt: min(joinedAt),
+      finishedAt: min(finishedAt),
+      startedAt: min(startedAt),
+      categoryName: max(courseCategories.name) as SQL<string>,
       totalCount: sql<number>`(
     SELECT COUNT(*) FROM ${studentsToCourses}
     WHERE ${studentsToCourses.studentId} = ${userId}

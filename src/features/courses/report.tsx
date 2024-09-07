@@ -18,7 +18,7 @@ interface Props {
   studentAnswers: {
     question: string
     isCorrect: boolean
-    questionId: number
+    id: number
   }[]
   isPassed: boolean | null
 }
@@ -84,7 +84,7 @@ const RapportFeature: React.FC<Props> = ({
         <div className="grid gap-5 mt-8">
           {studentAnswers.map((a) => (
             <div
-              key={`answer-${a.questionId}`}
+              key={`answer-${a.id}`}
               className="flex items-center justify-between p-4 border border-gray-200 rounded-2xl"
             >
               <div>

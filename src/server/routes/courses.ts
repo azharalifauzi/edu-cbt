@@ -22,7 +22,7 @@ import {
   getCoursesByTeacherId,
   getQuestionsByCourseId,
   getStudentAnswer,
-  getStudentRapport,
+  getStudentReport,
   isCourseStarted,
   isJoinedCourse,
 } from '../services/courses'
@@ -356,20 +356,20 @@ const app = new Hono()
   })
   .post('/:id/finish', authMiddleware(), async (c) => {
     const courseId = Number(c.req.param('id'))
-    const isJoined = await isJoinedCourse(courseId, c.get('userId'))
+    const report = await getStudentReport({ userId: c.get('userId'), courseId })
 
-    if (!isJoined) {
+    if (!report) {
       throw new ServerError(null, 401, "You aren't joined to this course")
     }
 
-    const report = await getStudentRapport(courseId, c.get('userId'))
+    const { questions } = report.data[0]
 
     await db
       .update(studentsToCourses)
       .set({
         finishedAt: dayjs().toISOString(),
-        isPassed: report.every((r) => r.isCorrect),
-        score: report.filter((r) => r.isCorrect).length,
+        isPassed: questions.every((r) => r.isCorrect),
+        score: questions.filter((r) => r.isCorrect).length,
       })
       .where(
         and(
@@ -617,21 +617,16 @@ const app = new Hono()
   .get('/:id/report', authMiddleware(), async (c) => {
     const id = Number(c.req.param('id'))
 
-    const isJoined =
-      (
-        await db
-          .select()
-          .from(studentsToCourses)
-          .where(eq(studentsToCourses.courseId, id))
-      ).length > 0
+    const report = await getStudentReport({
+      userId: c.get('userId'),
+      courseId: id,
+    })
 
-    if (!isJoined) {
+    if (!report) {
       throw new ServerError(null, 401, 'You are not a student of this course')
     }
 
-    const report = await getStudentRapport(id, c.get('userId'))
-
-    return generateJsonResponse(c, report)
+    return generateJsonResponse(c, report.data[0])
   })
   .post(
     '/categories',

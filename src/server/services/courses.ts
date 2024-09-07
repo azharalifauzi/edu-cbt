@@ -7,6 +7,7 @@ import {
   gte,
   ilike,
   lte,
+  sql,
 } from 'drizzle-orm'
 import { db } from '../lib/db'
 import {
@@ -315,58 +316,103 @@ export const isCourseStarted = async (courseId: number, userId: number) => {
   return !!course[0].isStarted
 }
 
-export const getStudentRapport = async (courseId: number, userId: number) => {
+interface GetStudentReportParams {
+  userId: number
+  courseId?: number
+  page?: number
+  size?: number
+}
+
+export const getStudentReport = async ({
+  userId,
+  courseId,
+  page = 1,
+  size = 10,
+}: GetStudentReportParams) => {
+  const skip = (page - 1) * size
+
+  const { studentId, joinedAt, finishedAt, startedAt } =
+    getTableColumns(studentsToCourses)
+
   const report = await db
     .select({
-      ...getTableColumns(courseQuestions),
-      optionData: jsonAggBuildObjectOrEmptyArray(
-        courseAnswerOptions,
-        getTableColumns(courseAnswerOptions)
-      ),
-      studentAnswer: jsonAggBuildObjectOrEmptyArray(
-        studentsToAnswers,
-        getTableColumns(studentsToAnswers)
-      ),
-    })
-    .from(courseQuestions)
-    .leftJoin(
-      studentsToAnswers,
-      eq(courseQuestions.id, studentsToAnswers.questionId)
+      ...getTableColumns(courses),
+      studentId,
+      joinedAt,
+      finishedAt,
+      startedAt,
+      categoryName: courseCategories.name,
+      totalCount: sql<number>`(
+    SELECT COUNT(*) FROM ${studentsToCourses}
+    WHERE ${studentsToCourses.studentId} = ${userId}
+  )`.as('totalCount'),
+      questionCounts: sql<number>`(SELECT COUNT(id) FROM ${courseQuestions}
+    WHERE ${courseQuestions.courseId} = ${courses.id})`.as('questionCounts'),
+      correctAnswers: sql<number>`(SELECT COUNT(*) FROM ${studentsToAnswers}
+    JOIN ${courseQuestions} ON ${courseQuestions.id} = ${studentsToAnswers.questionId}
+    JOIN ${courseAnswerOptions} ON ${courseAnswerOptions.id} = ${studentsToAnswers.answerId}
+    WHERE 
+      ${courseQuestions.courseId} = ${courses.id} AND
+      ${studentsToCourses.studentId} = ${userId} AND
+      ${courseAnswerOptions.isCorrect} = true)`.as('correctAnswers'),
+      questions: sql<
+        {
+          id: number
+          question: string
+          isCorrect: boolean
+        }[]
+      >`json_agg(
+    json_build_object(
+      'id', ${courseQuestions.id},
+      'question', ${courseQuestions.question},
+      'isCorrect', 
+      (
+        SELECT ${courseAnswerOptions.isCorrect}
+        FROM ${studentsToAnswers}
+        JOIN ${courseAnswerOptions} 
+          ON ${courseAnswerOptions.id} = ${studentsToAnswers.answerId}
+        WHERE ${studentsToAnswers.questionId} = ${courseQuestions.id} 
+          AND ${studentsToAnswers.studentId} = ${studentsToCourses.studentId}
+        LIMIT 1 -- ensure you only get one result
+      )
     )
-    .leftJoin(
-      courseAnswerOptions,
-      eq(studentsToAnswers.answerId, courseAnswerOptions.id)
+  )`.as('questions'),
+    })
+    .from(studentsToCourses)
+    .innerJoin(courses, eq(courses.id, studentsToCourses.courseId))
+    .innerJoin(courseCategories, eq(courseCategories.id, courses.categoryId))
+    .innerJoin(
+      courseQuestions,
+      eq(courseQuestions.courseId, studentsToCourses.courseId)
     )
     .where(
       and(
-        eq(studentsToAnswers.studentId, userId),
-        eq(courseQuestions.courseId, courseId),
-        eq(courseAnswerOptions.id, studentsToAnswers.answerId)
+        eq(studentsToCourses.studentId, userId),
+        courseId ? eq(courses.id, courseId) : undefined
       )
     )
-    .groupBy(courseQuestions.id)
+    .groupBy(
+      courses.id,
+      courseCategories.name,
+      studentsToCourses.studentId,
+      studentsToCourses.joinedAt,
+      studentsToCourses.finishedAt,
+      studentsToCourses.joinedAt,
+      studentsToCourses.startedAt
+    )
+    .limit(size)
+    .offset(skip)
 
-  const allQuestions = await getQuestionsByCourseId(courseId)
+  if (report.length === 0) {
+    return null
+  }
 
-  return allQuestions.map((q) => {
-    const answer = report.find((r) => r.id === q.id)
+  const totalCount = report[0].totalCount
+  const pageCount = Math.ceil(totalCount / size)
 
-    if (!answer) {
-      return {
-        isCorrect: false,
-        questionId: q.id,
-        question: q.question,
-        answerId: null,
-        answer: null,
-      }
-    }
-
-    return {
-      isCorrect: answer.optionData[0].isCorrect,
-      questionId: q.id,
-      question: q.question,
-      answerId: answer.optionData[0].id,
-      answer: answer.optionData[0].value,
-    }
-  })
+  return {
+    totalCount,
+    data: report.map(({ totalCount, ...r }) => r),
+    pageCount,
+  }
 }

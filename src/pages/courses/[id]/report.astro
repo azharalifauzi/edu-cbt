@@ -1,26 +1,23 @@
 ---
 import Layout from '@/layouts/Layout.astro'
 import RapportFeature from '@/features/courses/report'
-import {
-  getCoursesByStudentId,
-  getStudentRapport,
-} from '@/server/services/courses'
+import { getStudentReport } from '@/server/services/courses'
 
 const {
   params: { id },
-  locals: { user },
+  locals: { user }
 } = Astro
 
 const courseId = Number(id!)
 
-const report = await getStudentRapport(courseId, user.id)
-const {
-  data: [course],
-} = await getCoursesByStudentId(user.id, { courseId })
+const report = await getStudentReport({ courseId, userId: user.id })
 
-if (!course) {
+if (!report || !report.data[0].finishedAt) {
   return Astro.rewrite('/not-found')
 }
+
+const { name, categoryName, image, questions, questionCounts, correctAnswers } =
+  report.data[0]
 ---
 
 <Layout>
@@ -29,10 +26,10 @@ if (!course) {
     params={Astro.params}
     url={Astro.url}
     user={Astro.locals.user}
-    courseName={course.name}
-    courseCatetegory={course.category.name}
-    courseImage={course.image}
-    studentAnswers={report}
-    isPassed={course.studentData.isPassed}
+    courseName={name}
+    courseCatetegory={categoryName}
+    courseImage={image}
+    studentAnswers={questions}
+    isPassed={questionCounts === correctAnswers}
   />
 </Layout>

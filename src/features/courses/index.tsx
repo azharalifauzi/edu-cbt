@@ -12,20 +12,30 @@ import dayjs from 'dayjs'
 import humanizeDuration from 'humanize-duration'
 import React from 'react'
 
+interface Question {
+  id: number
+  question: string
+  isCorrect: boolean
+}
+
 interface Course {
   id: number
   name: string
+  slug: string
   image: string | null
-  category: {
-    name: string
-  }
+  categoryId: number
   createdAt: string
-  studentData: {
-    startedAt: string | null
-    finishedAt: string | null
-    joinedAt: string
-  }
+  updatedAt: string
+  publishedAt: string
   testDuration: number
+  studentId: number
+  joinedAt: string | null
+  finishedAt: string | null
+  startedAt: string | null
+  categoryName: string
+  questionCounts: number
+  correctAnswers: number
+  questions: Question[]
 }
 
 interface Props {
@@ -62,7 +72,7 @@ const columns = [
     },
     minSize: 300,
   }),
-  columnHelper.accessor('studentData.joinedAt', {
+  columnHelper.accessor('joinedAt', {
     header: () => <span>Date Joined</span>,
     cell: (info) => (
       <span className="font-semibold">
@@ -70,7 +80,7 @@ const columns = [
       </span>
     ),
   }),
-  columnHelper.accessor('category.name', {
+  columnHelper.accessor('categoryName', {
     header: () => <span>Category</span>,
     cell: (info) => <span className="font-bold">{info.getValue()}</span>,
   }),
@@ -78,9 +88,7 @@ const columns = [
     id: 'action',
     header: () => <span className="w-full text-center block">Action</span>,
     cell: (info) => {
-      const {
-        studentData: { finishedAt, startedAt },
-      } = info.row.original
+      const { finishedAt, startedAt } = info.row.original
 
       if (!startedAt)
         return (

@@ -1,13 +1,15 @@
 ---
 import Layout from '@/layouts/Layout.astro'
 import MyCoursesFeature from '@/features/courses'
-import { getCoursesByStudentId } from '@/server/services/courses'
+import {
+  getCoursesByStudentId,
+  getStudentReport
+} from '@/server/services/courses'
 
 const { user } = Astro.locals
 
-const courses = await getCoursesByStudentId(user.id, {
-  page: 1,
-  size: 999,
+const reports = await getStudentReport({
+  userId: user.id
 })
 ---
 
@@ -17,6 +19,6 @@ const courses = await getCoursesByStudentId(user.id, {
     params={Astro.params}
     url={Astro.url}
     user={Astro.locals.user}
-    data={courses.data}
+    data={reports?.data ?? []}
   />
 </Layout>

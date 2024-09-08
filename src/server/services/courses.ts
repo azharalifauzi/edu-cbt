@@ -6,11 +6,10 @@ import {
   getTableColumns,
   gte,
   ilike,
-  isNull,
+  type GetColumnData,
   lte,
   max,
   min,
-  or,
   SQL,
   sql,
 } from 'drizzle-orm'
@@ -89,7 +88,7 @@ export const getCourses = async (
 
   const getStudentDataColumn = <T extends PgColumn>(
     column: T
-  ) => sql<ReturnType<T['getSQLType']> | null>`
+  ) => sql<GetColumnData<T> | null>`
     (SELECT ${column} FROM ${studentsToCourses}
 		WHERE ${studentsToCourses.courseId} = ${courses.id} AND ${studentsToCourses.studentId} = ${userId}
 		LIMIT 1)`
@@ -374,7 +373,7 @@ export const getStudentReport = async ({
     JOIN ${courseAnswerOptions} ON ${courseAnswerOptions.id} = ${studentsToAnswers.answerId}
     WHERE 
       ${courseQuestions.courseId} = ${courses.id} AND
-      ${studentsToCourses.studentId} = ${userId} AND
+      ${studentsToAnswers.studentId} = ${userId} AND
       ${courseAnswerOptions.isCorrect} = true)`.as('correctAnswers'),
       questions: sql<
         {

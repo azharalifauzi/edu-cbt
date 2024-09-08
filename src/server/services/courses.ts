@@ -6,9 +6,11 @@ import {
   getTableColumns,
   gte,
   ilike,
+  isNull,
   lte,
   max,
   min,
+  or,
   SQL,
   sql,
 } from 'drizzle-orm'
@@ -65,12 +67,15 @@ interface GetCourseParams {
   search?: string
 }
 
-export const getCourses = async ({
-  page = 1,
-  search,
-  size = 10,
-  isPublished,
-}: GetCourseParams & { isPublished?: boolean } = {}) => {
+export const getCourses = async (
+  userId: number,
+  {
+    page = 1,
+    search,
+    size = 10,
+    isPublished,
+  }: GetCourseParams & { isPublished?: boolean } = {}
+) => {
   const skip = (page - 1) * size
 
   const totalCount = await db
@@ -78,6 +83,8 @@ export const getCourses = async ({
       count: count(),
     })
     .from(courses)
+
+  const { joinedAt, finishedAt, startedAt } = getTableColumns(studentsToCourses)
 
   const data = await db
     .select({
@@ -87,8 +94,12 @@ export const getCourses = async ({
         name: users.name,
         image: users.image,
       }),
+      joinedAt: min(joinedAt),
+      finishedAt: min(finishedAt),
+      startedAt: min(startedAt),
     })
     .from(courses)
+    .leftJoin(studentsToCourses, eq(studentsToCourses.courseId, courses.id))
     .leftJoin(teachersToCourses, eq(teachersToCourses.courseId, courses.id))
     .leftJoin(users, eq(teachersToCourses.teacherId, users.id))
     .groupBy(courses.id)
@@ -101,7 +112,11 @@ export const getCourses = async ({
           ? lte(courses.publishedAt, dayjs().toISOString())
           : isPublished === false
           ? gte(courses.publishedAt, dayjs().toISOString())
-          : undefined
+          : undefined,
+        or(
+          eq(studentsToCourses.studentId, userId),
+          isNull(studentsToCourses.finishedAt)
+        )
       )
     )
   const pageCount = Math.ceil(totalCount[0].count / size)

@@ -9,13 +9,9 @@ import { toast } from 'sonner'
 
 interface Props {
   defaultCourses: any
-  defaultMyCourses: any
 }
 
-const OverviewFeature: React.FC<Props> = ({
-  defaultCourses,
-  defaultMyCourses,
-}) => {
+const OverviewFeature: React.FC<Props> = ({ defaultCourses }) => {
   const queryClient = useQueryClient()
 
   const { data: courses } = useQuery({
@@ -32,22 +28,6 @@ const OverviewFeature: React.FC<Props> = ({
       return data.data
     },
     placeholderData: defaultCourses,
-  })
-
-  const { data: myCourses } = useQuery({
-    queryKey: [QueryKey.MyCourses],
-    queryFn: async () => {
-      const res = client.api.v1.course['my-courses'].$get({
-        param: {
-          page: '1',
-          size: '999',
-        },
-      })
-
-      const { data } = await unwrapResponse(res)
-      return data.data
-    },
-    placeholderData: defaultMyCourses,
   })
 
   const handleJoin = useMutation({
@@ -91,10 +71,9 @@ const OverviewFeature: React.FC<Props> = ({
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,_minmax(300px,1fr))] gap-6">
         {courses?.map((course) => {
-          const myCourse = myCourses?.find((c) => c.id === course.id)
-          const hasJoined = !!myCourse
-          const hasStarted = !!myCourse?.studentData.startedAt
-          const hasFinished = !!myCourse?.studentData.finishedAt
+          const hasJoined = !!course.joinedAt
+          const hasStarted = !!course.startedAt
+          const hasFinished = !!course.finishedAt
 
           return (
             <div

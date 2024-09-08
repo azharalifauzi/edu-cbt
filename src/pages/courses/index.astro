@@ -1,10 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro'
 import MyCoursesFeature from '@/features/courses'
-import {
-  getCoursesByStudentId,
-  getStudentReport
-} from '@/server/services/courses'
+import { getStudentReport } from '@/server/services/courses'
 
 const { user } = Astro.locals
 

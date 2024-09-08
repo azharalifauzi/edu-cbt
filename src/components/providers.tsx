@@ -11,7 +11,7 @@ import { RouteContextProvider, type RouteContext } from '@/hooks/route'
 import type { User } from '@/server/services/user'
 import { UserContextProvider } from '@/hooks/user'
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // default stale time to 5 minutes

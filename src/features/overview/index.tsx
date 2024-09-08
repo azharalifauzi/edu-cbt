@@ -54,7 +54,7 @@ const OverviewFeature: React.FC<Props> = ({ defaultCourses }) => {
         },
       })
 
-      queryClient.invalidateQueries({ queryKey: [QueryKey.MyCourses] })
+      queryClient.invalidateQueries({ queryKey: [QueryKey.Courses] })
     },
   })
 

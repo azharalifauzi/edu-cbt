@@ -27,6 +27,7 @@ import {
 } from '../models'
 import { jsonAggBuildObjectOrEmptyArray } from '../utils/drizzle'
 import dayjs from 'dayjs'
+import type { PgColumn } from 'drizzle-orm/pg-core'
 
 export const getCourseById = async (id: number) => {
   const course = await db
@@ -86,6 +87,13 @@ export const getCourses = async (
 
   const { joinedAt, finishedAt, startedAt } = getTableColumns(studentsToCourses)
 
+  const getStudentDataColumn = <T extends PgColumn>(
+    column: T
+  ) => sql<ReturnType<T['getSQLType']> | null>`
+    (SELECT ${column} FROM ${studentsToCourses}
+		WHERE ${studentsToCourses.courseId} = ${courses.id} AND ${studentsToCourses.studentId} = ${userId}
+		LIMIT 1)`
+
   const data = await db
     .select({
       ...getTableColumns(courses),
@@ -94,12 +102,11 @@ export const getCourses = async (
         name: users.name,
         image: users.image,
       }),
-      joinedAt: min(joinedAt),
-      finishedAt: min(finishedAt),
-      startedAt: min(startedAt),
+      joinedAt: getStudentDataColumn(joinedAt),
+      finishedAt: getStudentDataColumn(finishedAt),
+      startedAt: getStudentDataColumn(startedAt),
     })
     .from(courses)
-    .leftJoin(studentsToCourses, eq(studentsToCourses.courseId, courses.id))
     .leftJoin(teachersToCourses, eq(teachersToCourses.courseId, courses.id))
     .leftJoin(users, eq(teachersToCourses.teacherId, users.id))
     .groupBy(courses.id)
@@ -112,11 +119,7 @@ export const getCourses = async (
           ? lte(courses.publishedAt, dayjs().toISOString())
           : isPublished === false
           ? gte(courses.publishedAt, dayjs().toISOString())
-          : undefined,
-        or(
-          eq(studentsToCourses.studentId, userId),
-          isNull(studentsToCourses.finishedAt)
-        )
+          : undefined
       )
     )
   const pageCount = Math.ceil(totalCount[0].count / size)

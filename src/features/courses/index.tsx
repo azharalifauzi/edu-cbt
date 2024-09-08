@@ -1,8 +1,9 @@
 import Layout from '@/components/layout'
 import Link from '@/components/link'
-import { withGlobalProviders } from '@/components/providers'
+import { queryClient, withGlobalProviders } from '@/components/providers'
 import Table from '@/components/table'
 import { Button } from '@/components/ui/button'
+import { QueryKey } from '@/utils/fetcher'
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -92,14 +93,28 @@ const columns = [
 
       if (!startedAt)
         return (
-          <Button asChild className="mx-auto flex w-max" variant="purple">
+          <Button
+            asChild
+            className="mx-auto flex w-max"
+            variant="purple"
+            onClick={() => {
+              queryClient.invalidateQueries({ queryKey: [QueryKey.Courses] })
+            }}
+          >
             <Link to={`/courses/${info.getValue()}`}>Start Test</Link>
           </Button>
         )
 
       if (startedAt && !finishedAt) {
         return (
-          <Button asChild className="mx-auto flex w-max" variant="purple">
+          <Button
+            asChild
+            className="mx-auto flex w-max"
+            variant="purple"
+            onClick={() => {
+              queryClient.invalidateQueries({ queryKey: [QueryKey.Courses] })
+            }}
+          >
             <Link to={`/courses/${info.getValue()}`}>Continue Test</Link>
           </Button>
         )
